@@ -9,4 +9,4 @@ INPUT y;
 f = x + y;
 OUTPUT f;
 INPUTS
-1 2 3
+1
