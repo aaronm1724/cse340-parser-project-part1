@@ -91,21 +91,21 @@ void Parser::parse_statement_list() {
 }
 
 void Parser::parse_statement() {
-    cout << "[DEBUG] Entering parse_statement(), peek = " << lexer.peek(1).lexeme << "\n";
+    //cout << "[DEBUG] Entering parse_statement(), peek = " << lexer.peek(1).lexeme << "\n";
     Token t = lexer.peek(1);
     if (t.token_type == ID) {
-        cout << "[DEBUG] In parse_statement(), next token: " << lexer.peek(1).lexeme << "\n";
+        //cout << "[DEBUG] In parse_statement(), next token: " << lexer.peek(1).lexeme << "\n";
         expect(ID);
         expect(EQUAL);
         parse_expr();
         expect(SEMICOLON);
     } else if (t.token_type == INPUT) {
-        cout << "[DEBUG] Parsing INPUT statement\n";
+        //cout << "[DEBUG] Parsing INPUT statement\n";
         expect(INPUT);
         expect(ID);
         expect(SEMICOLON);
     } else if (t.token_type == OUTPUT) {
-        cout << "[DEBUG] Parsing OUTPUT statement\n";
+        //cout << "[DEBUG] Parsing OUTPUT statement\n";
         expect(OUTPUT);
         expect(ID);
         expect(SEMICOLON);
@@ -115,7 +115,7 @@ void Parser::parse_statement() {
 }
 
 void Parser::parse_expr() {
-    cout << "[DEBUG] Entered parse_expr()\n";
+    //cout << "[DEBUG] Entered parse_expr()\n";
     parse_term();
 
     Token t = lexer.peek(1);
@@ -127,7 +127,7 @@ void Parser::parse_expr() {
 }
 
 void Parser::parse_term() {
-    cout << "[DEBUG] Entered parse_term()\n";
+    //cout << "[DEBUG] Entered parse_term()\n";
     parse_factor();
     
     Token t = lexer.peek(1);
@@ -138,7 +138,7 @@ void Parser::parse_term() {
 }
 
 void Parser::parse_factor() {
-    cout << "[DEBUG] Entered parse_factor()\n";
+    //cout << "[DEBUG] Entered parse_factor()\n";
     Token t = lexer.peek(1);
     if (t.token_type == ID) {
         expect(ID);
@@ -154,6 +154,7 @@ void Parser::parse_factor() {
 }
 
 void Parser::parse_inputs_section() {
+    cout << "[DEBUG] Entered parse_inputs_section()\n";
     expect(INPUTS);
 
     Token t = lexer.peek(1);
