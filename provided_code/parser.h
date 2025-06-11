@@ -16,11 +16,12 @@ struct Symbol {
   IDType type;
   bool used_in_expr = false;
   bool initialized = false;
+  int line_declared = -1;
 
   Symbol() = default;
 
-  Symbol(IDType type, bool used_in_expr, bool initialized)
-    : type(type), used_in_expr(used_in_expr), initialized(initialized) {}
+  Symbol(IDType type, bool used_in_expr, bool initialized, int line_declared)
+    : type(type), used_in_expr(used_in_expr), initialized(initialized), line_declared(line_declared) {}
 };
 
 class Parser {

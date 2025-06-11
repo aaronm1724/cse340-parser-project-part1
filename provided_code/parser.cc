@@ -66,11 +66,13 @@ void Parser::parse_poly_section() {
         std::string id_name = id_token.lexeme;
 
         if (symbol_table.find(id_name) != symbol_table.end()) {
-            cout << "ERROR: Redeclaration of identifier " << id_name << "\n";
+            int original_line = symbol_table[id_name].line_declared;
+            int duplicate_line = id_token.line_no;
+            cout << "Semantic Error Code 1: " << original_line << " " << duplicate_line << "\n";
             exit(1);
         }
 
-        symbol_table[id_name] = {POLY_TYPE, false, true};
+        symbol_table[id_name] = {POLY_TYPE, false, true, id_token.line_no};
 
         Token m = lexer.GetToken();
         while (m.token_type != SEMICOLON) {
@@ -124,7 +126,7 @@ void Parser::parse_statement() {
             cout << "ERROR: Redeclaration of identifier " << id << "\n";
             exit(1);
         }
-        symbol_table[id] = {INPUT_TYPE, false, false};
+        symbol_table[id] = {INPUT_TYPE, false, false, id_token.line_no};
         expect(SEMICOLON);
     } else if (t.token_type == OUTPUT) {
         //cout << "[DEBUG] Parsing OUTPUT statement\n";
