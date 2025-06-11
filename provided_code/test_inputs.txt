@@ -3,7 +3,7 @@ TASKS
 POLY
 f = x^2;
 EXECUTE
-INPUT x;
-x = f;
+f = x + y;
+OUTPUT f;
 INPUTS
-1
+1 2

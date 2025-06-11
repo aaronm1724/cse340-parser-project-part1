@@ -168,7 +168,12 @@ void Parser::parse_factor() {
     //cout << "[DEBUG] Entered parse_factor()\n";
     Token t = lexer.peek(1);
     if (t.token_type == ID) {
-        expect(ID);
+        Token id_token = expect(ID);
+        std::string id = id_token.lexeme;
+        if (symbol_table.find(id) == symbol_table.end()) {
+            cout << "ERROR: Undeclared identifier " << id << "\n";
+            exit(1);
+        }
     } else if (t.token_type == NUM) {
         expect(NUM);
     } else if (t.token_type == LPAREN) {
