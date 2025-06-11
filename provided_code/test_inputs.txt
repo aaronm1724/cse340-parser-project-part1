@@ -4,6 +4,7 @@ POLY
 f = x^2;
 EXECUTE
 f = x + y;
+INPUT x;
 OUTPUT f;
 INPUTS
 1 2
