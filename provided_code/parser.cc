@@ -66,8 +66,8 @@ void Parser::parse_poly_section() {
         std::string id_name = id_token.lexeme;
 
         if (symbol_table.find(id_name) != symbol_table.end()) {
-            cout << "Error: Multiply declared identifier " << id_name << "\n";
-            syntax_error();
+            cout << "ERROR: Redeclaration of identifier " << id_name << "\n";
+            exit(1);
         }
 
         Symbol s;
@@ -111,9 +111,15 @@ void Parser::parse_statement() {
         parse_expr();
         expect(SEMICOLON);
     } else if (t.token_type == INPUT) {
-        //cout << "[DEBUG] Parsing INPUT statement\n";
+        cout << "[DEBUG] Parsing INPUT statement\n";
         expect(INPUT);
-        expect(ID);
+        Token id_token = expect(ID);
+        std::string id = id_token.lexeme;
+        if (symbol_table.find(id) != symbol_table.end()) {
+            cout << "ERROR: Redeclaration of identifier " << id << "\n";
+            exit(1);
+        }
+        symbol_table[id] = {INPUT_TYPE, false, false};
         expect(SEMICOLON);
     } else if (t.token_type == OUTPUT) {
         //cout << "[DEBUG] Parsing OUTPUT statement\n";
