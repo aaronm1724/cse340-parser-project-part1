@@ -3,5 +3,5 @@ TASKS
 POLY
 f = x^2;
 EXECUTE
-OUTPUT z;
+x = f;
 INPUTS

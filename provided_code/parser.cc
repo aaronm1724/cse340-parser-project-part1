@@ -102,7 +102,16 @@ void Parser::parse_statement() {
     Token t = lexer.peek(1);
     if (t.token_type == ID) {
         //cout << "[DEBUG] In parse_statement(), next token: " << lexer.peek(1).lexeme << "\n";
-        expect(ID);
+        Token lhs = expect(ID);
+        std::string id = lhs.lexeme;
+        if (symbol_table.find(id) == symbol_table.end()) {
+            cout << "ERROR: Undeclared identifier " << id << "\n";
+            exit(1);
+        }
+        if (symbol_table[id].type != POLY_TYPE) {
+            cout << "ERROR: Cannot assign to non-polynomial identifier " << id << "\n";
+            exit(1);
+        }
         expect(EQUAL);
         parse_expr();
         expect(SEMICOLON);
