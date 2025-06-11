@@ -4,7 +4,8 @@ POLY
 f = x^2;
 EXECUTE
 INPUT x;
-OUTPUT z;
+INPUT x;
+OUTPUT x;
 INPUT y;
 f = x + y;
 OUTPUT f;
