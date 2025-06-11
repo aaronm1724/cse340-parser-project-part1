@@ -185,7 +185,6 @@ void Parser::parse_inputs_section() {
             exit(1);
         }
         t = lexer.peek(1);
-
     }
 
     for (const auto &pair : symbol_table) {
