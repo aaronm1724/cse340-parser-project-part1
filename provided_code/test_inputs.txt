@@ -2,4 +2,9 @@ TASKS
 1
 POLY
 f = x^2;
-f = x^3;
+EXECUTE
+INPUT x;
+INPUT x;
+OUTPUT x;
+INPUTS
+1
