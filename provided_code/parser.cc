@@ -104,7 +104,7 @@ void Parser::parse_statement() {
         expect(ID);
         expect(SEMICOLON);
     } else if (t.token_type == OUTPUT) {
-        cout << "[DEBUG] Parsing INPUT statement\n";
+        cout << "[DEBUG] Parsing OUTPUT statement\n";
         expect(OUTPUT);
         expect(ID);
         expect(SEMICOLON);
