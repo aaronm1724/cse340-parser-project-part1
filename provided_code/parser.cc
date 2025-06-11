@@ -70,11 +70,7 @@ void Parser::parse_poly_section() {
             exit(1);
         }
 
-        Symbol s;
-        s.type = POLY_TYPE;
-        s.initialized = true;
-        symbol_table[id_name] = s;
-        expect(EQUAL);
+        symbol_table[id_name] = {POLY_TYPE, false, true};
 
         Token m = lexer.GetToken();
         while (m.token_type != SEMICOLON) {

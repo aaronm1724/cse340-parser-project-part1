@@ -17,6 +17,8 @@ struct Symbol {
   bool used_in_expr = false;
   bool initialized = false;
 
+  Symbol() = default;
+
   Symbol(IDType type, bool used_in_expr, bool initialized)
     : type(type), used_in_expr(used_in_expr), initialized(initialized) {}
 };
