@@ -168,10 +168,17 @@ void Parser::parse_inputs_section() {
     cout << "[DEBUG] Entered parse_inputs_section()\n";
     expect(INPUTS);
 
+    cout << "[DEBUG] Symbol Table at start of parse_inputs_section():\n";
+    for (const auto& pair : symbol_table) {
+        cout << "  Name: " << pair.first
+        << " | Type: " << (pair.second.type == INPUT_TYPE ? "INPUT" : "POLY")
+        << " | Initialized: " << (pair.second.initialized ? "true" : "false") << "\n";
+    }
     Token t = lexer.peek(1);
     while (t.token_type == NUM) {
         Token num = expect(NUM);
         bool matched = false;
+
         for (auto &pair : symbol_table) {
             Symbol &s = pair.second;
             if (s.type == INPUT_TYPE && !s.initialized) {
