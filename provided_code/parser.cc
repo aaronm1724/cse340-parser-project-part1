@@ -43,6 +43,7 @@ void Parser::parse_program()
     parse_tasks_section();
     parse_poly_section();
     parse_execute_section();
+    parse_inputs_section();
     expect(END_OF_FILE);
 }
 
