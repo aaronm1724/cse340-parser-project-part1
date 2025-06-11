@@ -170,10 +170,33 @@ void Parser::parse_inputs_section() {
 
     Token t = lexer.peek(1);
     while (t.token_type == NUM) {
-        expect(NUM);
+        Token num = expect(NUM);
+        bool matched = false;
+        for (auto &pair : symbol_table) {
+            Symbol &s = pair.second;
+            if (s.type == INPUT_TYPE && !s.initialized) {
+                s.initialized = true;
+                matched = true;
+                break;
+            }
+        }
+        if (!matched) {
+            cout << "ERROR: Too many input values\n";
+            exit(1);
+        }
         t = lexer.peek(1);
+
+    }
+
+    for (const auto &pair : symbol_table) {
+        const Symbol &s = pair.second;
+        if (s.type == INPUT_TYPE && !s.initialized) {
+            cout << "ERROR: Uninitialized input variable\n";
+            exit(1);
+        }
     }
 }
+
 int main()
 {
     // note: the parser class has a lexer object instantiated in it. You should not be declaring

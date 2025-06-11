@@ -1,0 +1,12 @@
+TASKS
+1
+POLY
+f = x^2;
+EXECUTE
+INPUT x;
+OUTPUT x;
+INPUT y;
+f = x + y;
+OUTPUT f;
+INPUTS
+1 2
