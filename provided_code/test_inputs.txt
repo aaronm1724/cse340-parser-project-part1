@@ -1,3 +1,5 @@
+TASKS
+1
 POLY
 f = x^2;
 f = x^3;
