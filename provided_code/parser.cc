@@ -90,17 +90,21 @@ void Parser::parse_statement_list() {
 }
 
 void Parser::parse_statement() {
+    cout << "[DEBUG] Entering parse_statement(), peek = " << lexer.peek(1).lexeme << "\n";
     Token t = lexer.peek(1);
     if (t.token_type == ID) {
+        cout << "[DEBUG] In parse_statement(), next token: " << lexer.peek(1).lexeme << "\n";
         expect(ID);
         expect(EQUAL);
         parse_expr();
         expect(SEMICOLON);
     } else if (t.token_type == INPUT) {
+        cout << "[DEBUG] Parsing INPUT statement\n";
         expect(INPUT);
         expect(ID);
         expect(SEMICOLON);
     } else if (t.token_type == OUTPUT) {
+        cout << "[DEBUG] Parsing INPUT statement\n";
         expect(OUTPUT);
         expect(ID);
         expect(SEMICOLON);
