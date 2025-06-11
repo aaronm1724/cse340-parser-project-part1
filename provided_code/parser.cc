@@ -81,7 +81,17 @@ void Parser::parse_execute_section() {
 }
 
 void Parser::parse_statement_list() {
+    parse_statement();
 
+    Token t = lexer.peek(1);
+    if (t.token_type == INPUT || t.token_type == OUTPUT || t.token_type ==ID) {
+        parse_statement_list();
+    }
+}
+
+void Parser::parse_statement() {
+    cout << "[DEBUG] Entered parse_statement()\n";
+    syntax_error();
 }
 
 int main()

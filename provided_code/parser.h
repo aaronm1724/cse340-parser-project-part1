@@ -22,6 +22,7 @@ class Parser {
     void parse_poly_section();
     void parse_execute_section();
     void parse_statement_list();
+    void parse_statement();
 };
 
 #endif
