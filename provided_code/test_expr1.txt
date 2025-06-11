@@ -6,3 +6,5 @@ EXECUTE
 f = x^2 + 3 - y;
 f = (x + 1)^2 - 3;
 f = x + 1 + 2 + 3;
+INPUTS
+1 2

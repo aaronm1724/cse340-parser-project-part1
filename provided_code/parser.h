@@ -26,6 +26,7 @@ class Parser {
     void parse_expr();
     void parse_term();
     void parse_factor();
+    void parse_inputs_section();
 };
 
 #endif

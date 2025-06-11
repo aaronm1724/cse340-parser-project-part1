@@ -152,6 +152,15 @@ void Parser::parse_factor() {
     }
 }
 
+void Parser::parse_inputs_section() {
+    expect(INPUTS);
+
+    Token t = lexer.peek(1);
+    while (t.token_type == NUM) {
+        expect(NUM);
+        t = lexer.peek(1);
+    }
+}
 int main()
 {
     // note: the parser class has a lexer object instantiated in it. You should not be declaring
