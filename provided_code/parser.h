@@ -23,6 +23,7 @@ class Parser {
     void parse_execute_section();
     void parse_statement_list();
     void parse_statement();
+    void parse_expr();
 };
 
 #endif

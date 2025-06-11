@@ -90,9 +90,30 @@ void Parser::parse_statement_list() {
 }
 
 void Parser::parse_statement() {
-    cout << "[DEBUG] Entered parse_statement()\n";
+    Token t = lexer.peek(1);
+    if (t.token_type == ID) {
+        expect(ID);
+        expect(EQUAL);
+        parse_expr();
+        expect(SEMICOLON);
+    } else if (t.token_type == INPUT) {
+        expect(INPUT);
+        expect(ID);
+        expect(SEMICOLON);
+    } else if (t.token_type == OUTPUT) {
+        expect(OUTPUT);
+        expect(ID);
+        expect(SEMICOLON);
+    } else {
+        syntax_error();
+    }
+}
+
+void Parser::parse_expr() {
+    cout << "[DEBUG] Entered parse_expr()\n";
     syntax_error();
 }
+
 
 int main()
 {
