@@ -120,7 +120,12 @@ void Parser::parse_statement() {
     } else if (t.token_type == OUTPUT) {
         //cout << "[DEBUG] Parsing OUTPUT statement\n";
         expect(OUTPUT);
-        expect(ID);
+        Token id_token = expect(ID);
+        std::string id = id_token.lexeme;
+        if (symbol_table.find(id) == symbol_table.end()) {
+            cout << "ERROR: Undeclared identifier " << id << "\n";
+            exit(1);
+        }
         expect(SEMICOLON);
     } else {
         syntax_error();
