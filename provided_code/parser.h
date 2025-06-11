@@ -8,6 +8,15 @@
 
 #include <string>
 #include "lexer.h"
+#include <map>
+
+enum IDType { POLY_TYPE, INPUT_TYPE };
+
+struct Symbol {
+  IDType type;
+  bool used_in_expr = false;
+  bool initialized = false;
+};
 
 class Parser {
   public:
@@ -27,6 +36,8 @@ class Parser {
     void parse_term();
     void parse_factor();
     void parse_inputs_section();
+
+    std::map<std::string, Symbol> symbol_table;
 };
 
 #endif

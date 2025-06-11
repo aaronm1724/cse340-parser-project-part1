@@ -62,7 +62,18 @@ void Parser::parse_poly_section() {
 
     Token t = lexer.peek(1);
     while (t.token_type == ID) {
-        expect(ID);
+        Token id_token = expect(ID);
+        std::string id_name = id_token.lexeme;
+
+        if (symbol_table.find(id_name) != symbol_table.end()) {
+            cout << "Error: Multiply declared identifier " << id_name << "\n";
+            syntax_error();
+        }
+
+        Symbol s;
+        s.type = POLY_TYPE;
+        s.initialized = true;
+        symbol_table[id_name] = s;
         expect(EQUAL);
 
         Token m = lexer.GetToken();
