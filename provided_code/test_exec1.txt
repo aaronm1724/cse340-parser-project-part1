@@ -1,0 +1,8 @@
+TASKS
+1
+POLY
+f = x^2;
+EXECUTE
+INPUT x;
+INPUTS
+1

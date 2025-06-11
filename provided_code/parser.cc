@@ -42,6 +42,7 @@ void Parser::parse_program()
 {
     parse_tasks_section();
     parse_poly_section();
+    parse_execute_section();
     expect(END_OF_FILE);
 }
 
@@ -71,7 +72,16 @@ void Parser::parse_poly_section() {
 
         t = lexer.peek(1);
     }
-        
+}
+
+void Parser::parse_execute_section() {
+    expect(EXECUTE);
+
+    parse_statement_list();
+}
+
+void Parser::parse_statement_list() {
+
 }
 
 int main()

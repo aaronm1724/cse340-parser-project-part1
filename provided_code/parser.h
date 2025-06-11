@@ -20,6 +20,8 @@ class Parser {
 
     void parse_tasks_section();
     void parse_poly_section();
+    void parse_execute_section();
+    void parse_statement_list();
 };
 
 #endif
