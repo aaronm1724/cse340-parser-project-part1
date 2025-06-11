@@ -24,6 +24,8 @@ class Parser {
     void parse_statement_list();
     void parse_statement();
     void parse_expr();
+    void parse_term();
+    void parse_factor();
 };
 
 #endif

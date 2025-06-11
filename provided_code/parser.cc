@@ -115,9 +115,42 @@ void Parser::parse_statement() {
 
 void Parser::parse_expr() {
     cout << "[DEBUG] Entered parse_expr()\n";
-    syntax_error();
+    parse_term();
+
+    Token t = lexer.peek(1);
+    while (t.token_type == PLUS || t.token_type == MINUS) {
+        lexer.GetToken();
+        parse_term();
+        t = lexer.peek(1);
+    }
 }
 
+void Parser::parse_term() {
+    cout << "[DEBUG] Entered parse_term()\n";
+    parse_factor();
+    
+    Token t = lexer.peek(1);
+    if (t.token_type == POWER) {
+        lexer.GetToken();
+        expect(NUM);
+    }
+}
+
+void Parser::parse_factor() {
+    cout << "[DEBUG] Entered parse_factor()\n";
+    Token t = lexer.peek(1);
+    if (t.token_type == ID) {
+        expect(ID);
+    } else if (t.token_type == NUM) {
+        expect(NUM);
+    } else if (t.token_type == LPAREN) {
+        expect(LPAREN);
+        parse_expr();
+        expect(RPAREN);
+    } else {
+        syntax_error();
+    }
+}
 
 int main()
 {
