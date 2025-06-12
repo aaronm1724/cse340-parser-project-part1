@@ -2,8 +2,8 @@ TASKS
 1
 POLY
 f;
-g;
+f;
 EXECUTE
-f = 2 + g;
+f = 3;
 INPUTS
-5
+3
