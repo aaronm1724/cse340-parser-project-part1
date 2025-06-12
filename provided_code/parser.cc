@@ -72,7 +72,7 @@ void Parser::parse_poly_section() {
             exit(1);
         }
 
-        symbol_table[id_name] = {POLY_TYPE, false, true, id_token.line_no};
+        symbol_table[id_name] = {POLY_TYPE, false, id_token.line_no};
 
         Token m = lexer.GetToken();
         while (m.token_type != SEMICOLON) {
@@ -119,7 +119,7 @@ void Parser::parse_statement() {
             cout << "ERROR: Redeclaration of identifier " << id << "\n";
             exit(1);
         }
-        symbol_table[id] = {INPUT_TYPE, false, false, id_token.line_no};
+        symbol_table[id] = {INPUT_TYPE, false, id_token.line_no};
         expect(SEMICOLON);
         current_assignment_lhs.clear();
     } else if (t.token_type == OUTPUT) {
@@ -190,38 +190,10 @@ void Parser::parse_inputs_section() {
     cout << "[DEBUG] Entered parse_inputs_section()\n";
     expect(INPUTS);
 
-    cout << "[DEBUG] Symbol Table at start of parse_inputs_section():\n";
-    for (const auto& pair : symbol_table) {
-        cout << "  Name: " << pair.first
-        << " | Type: " << (pair.second.type == INPUT_TYPE ? "INPUT" : "POLY")
-        << " | Initialized: " << (pair.second.initialized ? "true" : "false") << "\n";
-    }
     Token t = lexer.peek(1);
     while (t.token_type == NUM) {
-        Token num = expect(NUM);
-        bool matched = false;
-
-        for (auto &pair : symbol_table) {
-            Symbol &s = pair.second;
-            if (s.type == INPUT_TYPE && !s.initialized) {
-                s.initialized = true;
-                matched = true;
-                break;
-            }
-        }
-        if (!matched) {
-            cout << "ERROR: Too many input values\n";
-            exit(1);
-        }
+        expect(NUM);
         t = lexer.peek(1);
-    }
-
-    for (const auto &pair : symbol_table) {
-        const Symbol &s = pair.second;
-        if (s.type == INPUT_TYPE && !s.initialized) {
-            cout << "ERROR: Uninitialized input variable\n";
-            exit(1);
-        }
     }
 }
 
