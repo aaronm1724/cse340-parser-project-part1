@@ -106,14 +106,7 @@ void Parser::parse_statement() {
         //cout << "[DEBUG] In parse_statement(), next token: " << lexer.peek(1).lexeme << "\n";
         Token lhs = expect(ID);
         std::string id = lhs.lexeme;
-        if (symbol_table.find(id) == symbol_table.end()) {
-            cout << "ERROR: Undeclared identifier " << id << "\n";
-            exit(1);
-        }
-        if (symbol_table[id].type != POLY_TYPE) {
-            cout << "ERROR: Cannot assign to non-polynomial identifier " << id << "\n";
-            exit(1);
-        }
+        current_assignment_lhs = id;
         expect(EQUAL);
         parse_expr();
         expect(SEMICOLON);
@@ -128,6 +121,7 @@ void Parser::parse_statement() {
         }
         symbol_table[id] = {INPUT_TYPE, false, false, id_token.line_no};
         expect(SEMICOLON);
+        current_assignment_lhs.clear();
     } else if (t.token_type == OUTPUT) {
         //cout << "[DEBUG] Parsing OUTPUT statement\n";
         expect(OUTPUT);
@@ -174,6 +168,11 @@ void Parser::parse_factor() {
         std::string id = id_token.lexeme;
         if (symbol_table.find(id) == symbol_table.end()) {
             cout << "ERROR: Undeclared identifier " << id << "\n";
+            exit(1);
+        }
+
+        if (!current_assignment_lhs.empty() &&  id == current_assignment_lhs && symbol_table[id].type == POLY_TYPE) {
+            cout << "Semantic Error Code 2: " << id_token.line_no << "\n";
             exit(1);
         }
     } else if (t.token_type == NUM) {

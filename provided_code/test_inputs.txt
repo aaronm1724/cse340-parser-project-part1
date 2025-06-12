@@ -1,10 +1,8 @@
 TASKS
 1
 POLY
-f = x^2;
-g = x^3;
-f = x + 1;
+f;
 EXECUTE
-OUTPUT f;
+f = f + 1;
 INPUTS
 1

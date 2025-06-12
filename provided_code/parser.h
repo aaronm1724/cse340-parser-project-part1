@@ -9,6 +9,7 @@
 #include <string>
 #include "lexer.h"
 #include <map>
+#include <string>
 
 enum IDType { POLY_TYPE, INPUT_TYPE };
 
@@ -44,6 +45,7 @@ class Parser {
     void parse_inputs_section();
 
     std::map<std::string, Symbol> symbol_table;
+    std::string current_assignment_lhs;
 };
 
 #endif
