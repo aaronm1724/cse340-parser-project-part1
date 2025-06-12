@@ -45,6 +45,15 @@ void Parser::parse_program()
     parse_execute_section();
     parse_inputs_section();
     expect(END_OF_FILE);
+    for (const auto& entry : symbol_table) {
+        const std::string& id = entry.first;
+        const Symbol& symbol = entry.second;
+
+        if (symbol.type == POLY_TYPE && !symbol.used_in_expr) {
+            cout << "Semantic Error Code 4: " << symbol.line_declared << "\n";
+            exit(1);
+        }
+    }
 }
 
 void Parser::parse_tasks_section() {

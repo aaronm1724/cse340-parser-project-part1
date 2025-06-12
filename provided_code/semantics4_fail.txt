@@ -1,9 +1,9 @@
 TASKS
 1
 POLY
-f;
+f = 1;
+g = 2;
 EXECUTE
-f = g + 1;
-OUTPUT f;
+f = f + 1;
 INPUTS
-5
+1

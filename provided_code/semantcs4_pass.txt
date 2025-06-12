@@ -1,0 +1,10 @@
+TASKS
+1
+POLY
+f = 1;
+g = 2;
+EXECUTE
+f = f + g;
+INPUTS
+1
+2

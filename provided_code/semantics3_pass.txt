@@ -1,9 +1,0 @@
-TASKS
-1
-POLY
-f;
-EXECUTE
-f = 5;
-OUTPUT f;
-INPUTS
-5
