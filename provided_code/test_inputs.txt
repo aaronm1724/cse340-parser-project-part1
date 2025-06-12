@@ -3,6 +3,6 @@ TASKS
 POLY
 f;
 EXECUTE
-f = f + 1;
+f = 2 + 3;
 INPUTS
 1
