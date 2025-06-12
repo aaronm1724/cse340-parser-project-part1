@@ -166,8 +166,9 @@ void Parser::parse_factor() {
     if (t.token_type == ID) {
         Token id_token = expect(ID);
         std::string id = id_token.lexeme;
+
         if (symbol_table.find(id) == symbol_table.end()) {
-            cout << "ERROR: Undeclared identifier " << id << "\n";
+            cout << "Semantic Error Code 3: " << id_token.line_no << "\n";
             exit(1);
         }
 
