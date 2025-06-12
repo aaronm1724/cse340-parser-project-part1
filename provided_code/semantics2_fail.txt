@@ -1,0 +1,12 @@
+TASKS
+1
+POLY
+f;
+EXECUTE
+f = f + 3;
+INPUT
+y;
+OUTPUT
+f;
+INPUTS
+7

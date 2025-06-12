@@ -1,9 +1,0 @@
-TASKS
-1
-POLY
-f = x^2 + 3x + 2;
-g = x - 1;
-EXECUTE
-OUTPUT g;
-INPUTS
-1
