@@ -5,9 +5,9 @@ F1 = x^2 + 1;
 G2(X,Y) = X Y^2 + X Y;
 EXECUTE
 INPUT Z;
-X = G(Z);         // line 9: G is undeclared
+X = G(Z); 
 Y = G2(Z,Z);
-X = F(Z);         // line 11: F is undeclared
+X = F(Z); 
 OUTPUT X;
 OUTPUT Y;
 INPUTS
