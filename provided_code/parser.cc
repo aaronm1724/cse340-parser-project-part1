@@ -297,7 +297,9 @@ void Parser::parse_poly_evaluation() {
     Token id_token = expect(ID);
     std::string poly_name = id_token.lexeme;
     int line = id_token.line_no;
+    std::cerr << "[debug] evaluating poly: " << poly_name << " on line " << line << std::endl;
     if (poly_decl_lines.find(poly_name) == poly_decl_lines.end()) {
+        std::cerr << "[debug] poly not declared" << std::endl;
         undeclared_eval_lines.push_back(line);
     }
     expect(LPAREN);
