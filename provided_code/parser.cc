@@ -70,7 +70,7 @@ void Parser::parse_poly_decl_list() {
     Token t = lexer.peek(1);
     if (t.token_type == ID) {
         parse_poly_decl_list();
-    } else if (t.token_type != EXECUTE) {
+    } else if (t.token_type != EXECUTE && t.token_type != END_OF_FILE) {
         syntax_error();
     }
 }
@@ -191,7 +191,7 @@ void Parser::parse_execute_section() {
 }
 
 void Parser::parse_statement_list() {
-    
+
 }
 
 void Parser::parse_statement() {
