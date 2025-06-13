@@ -10,6 +10,7 @@
 #include <iostream>
 #include <cstdlib>
 #include "parser.h"
+#include <algorithm>
 
 using namespace std;
 
