@@ -8,7 +8,7 @@ EXECUTE
 INPUT X;
 Y = F1(X, X);
 Z = F2(X);
-W = F3(4); 
+W = F3(X); 
 OUTPUT Y;
 OUTPUT Z;
 OUTPUT W;
