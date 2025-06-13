@@ -140,6 +140,7 @@ void Parser::parse_statement() {
             cout << "ERROR: Undeclared identifier " << id << "\n";
             exit(1);
         }
+        symbol_table[id].used_in_expr = true;
         expect(SEMICOLON);
     } else {
         syntax_error();
