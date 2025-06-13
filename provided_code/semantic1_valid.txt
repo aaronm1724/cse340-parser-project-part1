@@ -6,7 +6,7 @@ F2 = x^2 + 3;
 G(X,Y) = X Y + Y;
 EXECUTE
 INPUT Z;
-X = F1;
+X = F1(Z);
 Y = G(Z,Z);
 OUTPUT X;
 OUTPUT Y;
