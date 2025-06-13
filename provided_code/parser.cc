@@ -92,16 +92,6 @@ void Parser::parse_poly_section() {
         std::cout << std::endl;
         exit(0);
     }
-
-    if (!undeclared_eval_lines.empty()) {
-        std::sort(undeclared_eval_lines.begin(), undeclared_eval_lines.end());
-        std::cout << "Semantic Error Code 3:";
-        for (int line : undeclared_eval_lines) {
-            std::cout << " " << line;
-        }
-        std::cout << std::endl;
-        exit(0);
-    }
 }
 
 void Parser::parse_poly_decl_list() {
@@ -251,6 +241,16 @@ void Parser::parse_primary() {
 void Parser::parse_execute_section() {
     expect(EXECUTE);
     parse_statement_list();
+
+    if (!undeclared_eval_lines.empty()) {
+        std::sort(undeclared_eval_lines.begin(), undeclared_eval_lines.end());
+        std::cout << "Semantic Error Code 3:";
+        for (int line : undeclared_eval_lines) {
+            std::cout << " " << line;
+        }
+        std::cout << std::endl;
+        exit(0);
+    }
 }
 
 void Parser::parse_statement_list() {
