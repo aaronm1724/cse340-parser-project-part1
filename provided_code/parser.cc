@@ -14,6 +14,21 @@
 
 using namespace std;
 
+enum StmtType { STMT_INPUT, STMT_OUTPUT, STMT_ASSIGN };
+
+struct stmt_t {
+    StmtType type;
+    int var = -1;
+    int lhs = -1;
+    void* eval = nullptr;
+    stmt_t* next = nullptr;
+};
+
+struct poly_eval_t {
+    std::string name;
+    std::vector<std::string> args;
+};
+
 // ====== Utility Functions ======
 void Parser::syntax_error()
 {
@@ -240,7 +255,11 @@ void Parser::parse_primary() {
 // ====== EXECUTE Section ======
 void Parser::parse_execute_section() {
     expect(EXECUTE);
-    parse_statement_list();
+    stmt_list_head =parse_statement_list();
+    if (stmt_list_head == nullptr) {
+        std::cerr << "[fatal] no statements parsed in EXECUTE section\n";
+        syntax_error();
+    } 
 
     if (!undeclared_eval_lines.empty()) {
         std::sort(undeclared_eval_lines.begin(), undeclared_eval_lines.end());
@@ -263,47 +282,83 @@ void Parser::parse_execute_section() {
     }
 }
 
-void Parser::parse_statement_list() {
-    parse_statement();
+stmt_t* Parser::parse_statement_list() {
+    stmt_t* first = parse_statement();
+    stmt_t* current = first;
     Token t = lexer.peek(1);
-    if (t.token_type == INPUT || t.token_type == OUTPUT || t.token_type == ID) {
-        parse_statement_list();
+    while (t.token_type == INPUT || t.token_type == OUTPUT || t.token_type == ID) {
+       current->next = parse_statement();
+       current = current->next;
+       t = lexer.peek(1);
     }
+
+    return first;
 }
 
-void Parser::parse_statement() {
+stmt_t* Parser::parse_statement() {
     Token t = lexer.peek(1);
     if (t.token_type == ID) {
-        parse_assign_statement();
+        return parse_assign_statement();
     } else if (t.token_type == INPUT) {
-        parse_input_statement();
+        return parse_input_statement();
     } else if (t.token_type == OUTPUT) {
-        parse_output_statement();
+        return parse_output_statement();
     } else {
         syntax_error();
+        return nullptr;
     }
 }
 
-void Parser::parse_input_statement() {
+stmt_t* Parser::parse_input_statement() {
     expect(INPUT);
-    expect(ID);
+    Token id_token = expect(ID);
     expect(SEMICOLON);
+
+    std::string var_name = id_token.lexeme;
+    if (location_table.find(var_name) == location_table.end()) {
+        location_table[var_name] = next_available++;
+    }
+
+    stmt_t* stmt = new stmt_t;
+    stmt->type = STMT_INPUT;
+    stmt->var = location_table[var_name];
+    return stmt;
 }
 
-void Parser::parse_output_statement() {
+stmt_t* Parser::parse_output_statement() {
     expect(OUTPUT);
-    expect(ID);
+    Token id_token = expect(ID);
     expect(SEMICOLON);
+
+    std::string var_name = id_token.lexeme;
+    if (location_table.find(var_name) == location_table.end()) {
+        location_table[var_name] = next_available++;
+    }
+
+    stmt_t* stmt = new stmt_t;
+    stmt->type = STMT_OUTPUT;
+    stmt->var = location_table[var_name];
+    return stmt;
 }
 
-void Parser::parse_assign_statement() {
-    expect(ID);
+stmt_t* Parser::parse_assign_statement() {
+    Token lhs_token = expect(ID);
+    std::string lhs_name = lhs_token.lexeme;
+    if (location_table.find(lhs_name) == location_table.end()) {
+        location_table[lhs_name] = next_available++;
+    }
     expect(EQUAL);
-    parse_poly_evaluation();
+    poly_eval_t* eval = parse_poly_evaluation();
     expect(SEMICOLON);
+
+    stmt_t* stmt = new stmt_t;
+    stmt->type = STMT_ASSIGN;
+    stmt->lhs = location_table[lhs_name];
+    stmt->eval = eval;
+    return stmt;
 }
 
-void Parser::parse_poly_evaluation() {
+poly_eval_t* Parser::parse_poly_evaluation() {
     Token id_token = expect(ID);
     std::string poly_name = id_token.lexeme;
     int line = id_token.line_no;
@@ -326,6 +381,11 @@ void Parser::parse_poly_evaluation() {
             wrong_arity_lines.push_back(line);
         }
     }
+
+    poly_eval_t* eval = new poly_eval_t;
+    eval->name = poly_name;
+    eval->args = args;
+    return eval;
 }
 
 std::vector<std::string> Parser::parse_argument_list() {

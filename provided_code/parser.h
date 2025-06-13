@@ -27,6 +27,13 @@ class Parser {
     std::vector<int> invalid_lines;
     std::vector<int> undeclared_eval_lines;
     std::vector<int> wrong_arity_lines;
+    // ====== Memory and Execution State for Task 2 ======
+    std::map<std::string, int> location_table;
+    std::vector<int> memory = std::vector<int>(1000);
+    std::vector<int> input_values;
+    int next_available = 0;
+    int next_input = 0;
+    stmt_t* stmt_list_head = nullptr;
 
     // ====== Parser methods ======
     void parse_tasks_section();
@@ -47,12 +54,12 @@ class Parser {
     void parse_add_operator();
     void parse_coefficient();
     void parse_execute_section();
-    void parse_statement_list();
-    void parse_statement();
-    void parse_input_statement();
-    void parse_output_statement();
-    void parse_assign_statement();
-    void parse_poly_evaluation();
+    stmt_t* parse_statement_list();
+    stmt_t* parse_statement();
+    stmt_t* parse_input_statement();
+    stmt_t* parse_output_statement();
+    stmt_t* parse_assign_statement();
+    poly_eval_t* parse_poly_evaluation();
     std::vector<std::string> parse_argument_list();
     void parse_argument(std::vector<std::string>& args);
     void parse_inputs_section();
