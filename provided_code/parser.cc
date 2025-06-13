@@ -121,7 +121,6 @@ void Parser::parse_poly_header() {
     Token t = lexer.peek(1);
     if (t.token_type == LPAREN) {
         expect(LPAREN);
-        expect(ID);
         poly_params[current_poly] = parse_id_list();
         expect(RPAREN);
     }
