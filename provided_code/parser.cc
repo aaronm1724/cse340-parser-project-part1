@@ -179,10 +179,14 @@ void Parser::parse_term() {
 }
 
 void Parser::parse_monomial_list() {
-    Token t = lexer.peek(1);
-    if (t.token_type == ID || t.token_type == LPAREN) {
-        parse_monomial();
-        parse_monomial_list();
+    while (true) {
+        Token t = lexer.peek(1);
+        if (t.token_type == ID || t.token_type == LPAREN) {
+            parse_monomial();
+            t = lexer.peek(1);
+        } else {
+            break;
+        }
     }
 }
 
