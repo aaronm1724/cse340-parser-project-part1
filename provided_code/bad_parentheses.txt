@@ -1,0 +1,7 @@
+TASKS
+1
+POLY
+F = ((x + 3);   // ⛔ Unmatched parentheses
+EXECUTE
+INPUTS
+7
