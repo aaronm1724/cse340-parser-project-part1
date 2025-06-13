@@ -322,7 +322,7 @@ void Parser::parse_poly_evaluation() {
             wrong_arity_lines.push_back(line);
         }
     } else {
-        if (!args.empty()) {
+        if (args.size() != 1) {
             wrong_arity_lines.push_back(line);
         }
     }
