@@ -60,6 +60,7 @@ class Parser {
     void parse_argument_list();
     void parse_argument();
     void parse_inputs_section();
+    void parse_output_section();
 
     std::map<std::string, Symbol> symbol_table;
     std::string current_assignment_lhs;

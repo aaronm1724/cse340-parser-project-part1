@@ -1,5 +1,11 @@
 TASKS
-1
+1 2 3
 POLY
-F = x^2 + 5;
+F = x^2 + 3;
 G(x,y) = 2 x y^2 + 3 y;
+EXECUTE
+INPUT x;
+OUTPUT y;
+z = G(x, 2);
+INPUTS
+42 17

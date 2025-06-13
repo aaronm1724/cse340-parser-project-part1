@@ -1,4 +1,0 @@
-TASKS
-1
-POLY
-H = x^3 + x + 1;

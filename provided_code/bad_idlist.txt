@@ -1,4 +1,0 @@
-TASKS
-1
-POLY
-G(x y) = x + y;

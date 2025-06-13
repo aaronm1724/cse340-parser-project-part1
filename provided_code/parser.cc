@@ -13,6 +13,7 @@
 
 using namespace std;
 
+// ====== Utility Functions ======
 void Parser::syntax_error()
 {
     cout << "SYNTAX ERROR !!!!!&%!!\n";
@@ -34,19 +35,17 @@ Token Parser::expect(TokenType expected_type)
 }
 
 // Parsing
-
-// This function is simply to illustrate the GetToken() function
-// you will not need it for your project and you can delete it
-// the function also illustrates the use of peek()
+// ====== Top-Level Program ======
 void Parser::parse_program()
 {
     parse_tasks_section();
     parse_poly_section();
-    // parse_execute_section();
-    //parse_inputs_section();
+    parse_execute_section();
+    parse_inputs_section();
     expect(END_OF_FILE);
 }
 
+// ====== TASKS Section ======
 void Parser::parse_tasks_section() {
     expect(TASKS);
     parse_num_list();
@@ -60,6 +59,7 @@ void Parser::parse_num_list() {
     }
 }
 
+// ====== POLY Section ======
 void Parser::parse_poly_section() {
     expect(POLY);
     parse_poly_decl_list();
@@ -70,7 +70,7 @@ void Parser::parse_poly_decl_list() {
     Token t = lexer.peek(1);
     if (t.token_type == ID) {
         parse_poly_decl_list();
-    } else if (t.token_type != EXECUTE && t.token_type != END_OF_FILE) {
+    } else if (t.token_type != EXECUTE) {
         syntax_error();
     }
 }
@@ -183,29 +183,88 @@ void Parser::parse_primary() {
     }
 }
 
-
+// ====== EXECUTE Section ======
 void Parser::parse_execute_section() {
     expect(EXECUTE);
-
     parse_statement_list();
 }
 
 void Parser::parse_statement_list() {
-
+    parse_statement();
+    Token t = lexer.peek(1);
+    if (t.token_type == INPUT || t.token_type == OUTPUT || t.token_type == ID) {
+        parse_statement_list();
+    }
 }
 
 void Parser::parse_statement() {
+    Token t = lexer.peek(1);
+    if (t.token_type == ID) {
+        parse_assign_statement();
+    } else if (t.token_type == INPUT) {
+        parse_input_statement();
+    } else if (t.token_type == OUTPUT) {
+        parse_output_statement();
+    } else {
+        syntax_error();
+    }
 }
 
-void Parser::parse_inputs_section() {
-    cout << "[DEBUG] Entered parse_inputs_section()\n";
-    expect(INPUTS);
+void Parser::parse_input_statement() {
+    expect(INPUT);
+    expect(ID);
+    expect(SEMICOLON);
+}
 
+void Parser::parse_output_statement() {
+    expect(OUTPUT);
+    expect(ID);
+    expect(SEMICOLON);
+}
+
+void Parser::parse_assign_statement() {
+    expect(ID);
+    expect(EQUAL);
+    parse_poly_evaluation();
+    expect(SEMICOLON);
+}
+
+void Parser::parse_poly_evaluation() {
+    expect(ID);
+    expect(LPAREN);
+    parse_argument_list();
+    expect(RPAREN);
+}
+
+void Parser::parse_argument_list() {
+    parse_argument();
     Token t = lexer.peek(1);
-    while (t.token_type == NUM) {
-        expect(NUM);
-        t = lexer.peek(1);
+    if (t.token_type == COMMA) {
+        expect(COMMA);
+        parse_argument_list();
     }
+}
+
+void Parser::parse_argument() {
+    Token t = lexer.peek(1);
+    if (t.token_type == NUM) {
+        expect(NUM);
+    } else if (t.token_type == ID) {
+        Token t2 = lexer.peek(2);
+        if (t2.token_type == LPAREN) {
+            parse_poly_evaluation();
+        } else {
+            expect(ID);
+        }
+    } else {
+        syntax_error();
+    }
+}
+
+// ====== INPUTS Section ======
+void Parser::parse_inputs_section() {
+    expect(INPUTS);
+    parse_num_list();
 }
 
 int main()
