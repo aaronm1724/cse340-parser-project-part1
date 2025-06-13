@@ -30,6 +30,7 @@ void Parser::syntax_error()
 Token Parser::expect(TokenType expected_type)
 {
     Token t = lexer.GetToken();
+    std::cout << "[expect] got token: " << t.lexeme << " (type: " << t.token_type << "), expected: " << expected_type << std::endl;
     if (t.token_type != expected_type)
         syntax_error();
     return t;
@@ -144,6 +145,7 @@ void Parser::parse_poly_body() {
 }
 
 void Parser::parse_term_list() {
+    std::cout << "in parse_term_list" << std::endl;
     parse_term();
     Token t = lexer.peek(1);
     if (t.token_type == PLUS || t.token_type == MINUS) {
@@ -164,6 +166,7 @@ void Parser::parse_add_operator() {
 }
 
 void Parser::parse_term() {
+    std::cout << "in parse_term" << std::endl;
     Token t = lexer.peek(1);
     if (t.token_type == NUM) {
         parse_coefficient();
@@ -179,6 +182,7 @@ void Parser::parse_term() {
 }
 
 void Parser::parse_monomial_list() {
+    std::cout << "in parse_monomial_list" << std::endl;
     while (true) {
         Token t = lexer.peek(1);
         if (t.token_type == ID || t.token_type == LPAREN) {
@@ -191,6 +195,7 @@ void Parser::parse_monomial_list() {
 }
 
 void Parser::parse_monomial() {
+    std::cout << "in parse_monomial" << std::endl;
     Token t = lexer.peek(1);
     if (t.token_type == ID || t.token_type == LPAREN) {
         parse_primary();
@@ -213,6 +218,7 @@ void Parser::parse_exponent() {
 }
 
 void Parser::parse_primary() {
+    std::cout << "in parse_primary" << std::endl;
     Token t = lexer.peek(1);
     if (t.token_type == ID) {
         Token id_token = expect(ID);
