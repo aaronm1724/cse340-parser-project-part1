@@ -26,6 +26,7 @@ class Parser {
     std::map<std::string, std::vector<std::string>> poly_params;
     std::vector<int> invalid_lines;
     std::vector<int> undeclared_eval_lines;
+    std::vector<int> wrong_arity_lines;
 
     // ====== Parser methods ======
     void parse_tasks_section();
@@ -52,8 +53,8 @@ class Parser {
     void parse_output_statement();
     void parse_assign_statement();
     void parse_poly_evaluation();
-    void parse_argument_list();
-    void parse_argument();
+    std::vector<std::string> parse_argument_list();
+    void parse_argument(std::vector<std::string>& args);
     void parse_inputs_section();
 };
 

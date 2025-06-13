@@ -251,6 +251,16 @@ void Parser::parse_execute_section() {
         std::cout << std::endl;
         exit(0);
     }
+
+    if (!wrong_arity_lines.empty()) {
+        std::sort(wrong_arity_lines.begin(), wrong_arity_lines.end());
+        std::cout << "Semantic Error Code 4:";
+        for (int line : wrong_arity_lines) {
+            std::cout << " " << line;
+        }
+        std::cout << std::endl;
+        exit(0);
+    }
 }
 
 void Parser::parse_statement_list() {
@@ -303,29 +313,44 @@ void Parser::parse_poly_evaluation() {
         undeclared_eval_lines.push_back(line);
     }
     expect(LPAREN);
-    parse_argument_list();
+    std::vector<std::string> args = parse_argument_list();
     expect(RPAREN);
-}
 
-void Parser::parse_argument_list() {
-    parse_argument();
-    Token t = lexer.peek(1);
-    if (t.token_type == COMMA) {
-        expect(COMMA);
-        parse_argument_list();
+    if (poly_params.find(poly_name) != poly_params.end()) {
+        std::vector<std::string> expected_params = poly_params[poly_name];
+        if (args.size() != expected_params.size()) {
+            wrong_arity_lines.push_back(line);
+        }
+    } else {
+        if (!args.empty()) {
+            wrong_arity_lines.push_back(line);
+        }
     }
 }
 
-void Parser::parse_argument() {
+std::vector<std::string> Parser::parse_argument_list() {
+    std::vector<std::string> args;
+    parse_argument(args);
+    while (lexer.peek(1).token_type == COMMA) {
+        expect(COMMA);
+        parse_argument(args);
+    }
+    return args;
+}
+
+void Parser::parse_argument(std::vector<std::string>& args) {
     Token t = lexer.peek(1);
+    // Only push arguments for base NUM or ID types (not nested evaluations)
     if (t.token_type == NUM) {
-        expect(NUM);
+        Token t1 = expect(NUM);
+        args.push_back(t1.lexeme);
     } else if (t.token_type == ID) {
         Token t2 = lexer.peek(2);
         if (t2.token_type == LPAREN) {
             parse_poly_evaluation();
         } else {
-            expect(ID);
+            Token t3 = expect(ID);
+            args.push_back(t3.lexeme);
         }
     } else {
         syntax_error();

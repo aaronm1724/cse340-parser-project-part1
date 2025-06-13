@@ -1,0 +1,16 @@
+TASKS
+1
+POLY
+F1(A) = A^2 + A;
+F2(A, B) = A + B;
+F3 = x^2 + 1;
+EXECUTE
+INPUT X;
+Y = F1(X, X);      // line 9: too many args
+Z = F2(X);         // line 10: too few args
+W = F3(X);         // line 11: should not take any args
+OUTPUT Y;
+OUTPUT Z;
+OUTPUT W;
+INPUTS
+1
