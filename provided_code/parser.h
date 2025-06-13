@@ -10,7 +10,7 @@
 #include "lexer.h"
 #include <map>
 #include <string>
-
+#include <vector>
 class Parser {
   public:
     void parse_program();
@@ -25,6 +25,7 @@ class Parser {
     std::string current_poly;
     std::map<std::string, std::vector<std::string>> poly_params;
     std::vector<int> invalid_lines;
+    std::vector<int> undeclared_eval_lines;
 
     // ====== Parser methods ======
     void parse_tasks_section();
@@ -54,7 +55,6 @@ class Parser {
     void parse_argument_list();
     void parse_argument();
     void parse_inputs_section();
-
 };
 
 #endif

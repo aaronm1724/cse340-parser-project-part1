@@ -92,6 +92,16 @@ void Parser::parse_poly_section() {
         std::cout << std::endl;
         exit(0);
     }
+
+    if (!undeclared_eval_lines.empty()) {
+        std::sort(undeclared_eval_lines.begin(), undeclared_eval_lines.end());
+        std::cout << "Semantic Error Code 3:";
+        for (int line : undeclared_eval_lines) {
+            std::cout << " " << line;
+        }
+        std::cout << std::endl;
+        exit(0);
+    }
 }
 
 void Parser::parse_poly_decl_list() {
@@ -145,7 +155,6 @@ void Parser::parse_poly_body() {
 }
 
 void Parser::parse_term_list() {
-    std::cout << "in parse_term_list" << std::endl;
     parse_term();
     Token t = lexer.peek(1);
     if (t.token_type == PLUS || t.token_type == MINUS) {
@@ -166,7 +175,6 @@ void Parser::parse_add_operator() {
 }
 
 void Parser::parse_term() {
-    std::cout << "in parse_term" << std::endl;
     Token t = lexer.peek(1);
     if (t.token_type == NUM) {
         parse_coefficient();
@@ -182,7 +190,6 @@ void Parser::parse_term() {
 }
 
 void Parser::parse_monomial_list() {
-    std::cout << "in parse_monomial_list" << std::endl;
     while (true) {
         Token t = lexer.peek(1);
         if (t.token_type == ID || t.token_type == LPAREN) {
@@ -195,7 +202,6 @@ void Parser::parse_monomial_list() {
 }
 
 void Parser::parse_monomial() {
-    std::cout << "in parse_monomial" << std::endl;
     Token t = lexer.peek(1);
     if (t.token_type == ID || t.token_type == LPAREN) {
         parse_primary();
@@ -218,7 +224,6 @@ void Parser::parse_exponent() {
 }
 
 void Parser::parse_primary() {
-    std::cout << "in parse_primary" << std::endl;
     Token t = lexer.peek(1);
     if (t.token_type == ID) {
         Token id_token = expect(ID);
@@ -289,7 +294,12 @@ void Parser::parse_assign_statement() {
 }
 
 void Parser::parse_poly_evaluation() {
-    expect(ID);
+    Token id_token = expect(ID);
+    std::string poly_name = id_token.lexeme;
+    int line = id_token.line_no;
+    if (poly_decl_lines.find(poly_name) == poly_decl_lines.end()) {
+        undeclared_eval_lines.push_back(line);
+    }
     expect(LPAREN);
     parse_argument_list();
     expect(RPAREN);
