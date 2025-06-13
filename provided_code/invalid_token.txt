@@ -1,8 +1,0 @@
-TASKS
-1
-POLY
-F = x;
-EXECUTE
-INPUT ;       // ⛔ Missing identifier
-INPUTS
-10

@@ -1,8 +1,0 @@
-TASKS
-1
-POLY
-G(x) = x;
-EXECUTE
-z = G(, 5);   // ⛔ Invalid argument list (starts with comma)
-INPUTS
-9

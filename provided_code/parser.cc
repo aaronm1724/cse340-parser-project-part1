@@ -63,6 +63,23 @@ void Parser::parse_num_list() {
 void Parser::parse_poly_section() {
     expect(POLY);
     parse_poly_decl_list();
+
+    std::vector<int> duplicates;
+    for (const auto& pair : poly_decl_lines) {
+        const std::vector<int>& lines = pair.second;
+        if (lines.size() > 1) {
+            duplicates.insert(duplicates.end(), lines.begin() + 1, lines.end());
+        }
+    }
+
+    if (!duplicates.empty()) {
+        std::cout << "Semantic Error Code 1:";
+        for (int line : duplicates) {
+            std::cout << " " << line;
+        }
+        std::cout << std::endl;
+        exit(0);
+    }
 }
 
 void Parser::parse_poly_decl_list() {
@@ -84,6 +101,9 @@ void Parser::parse_poly_decl() {
 
 void Parser::parse_poly_header() {
     Token id_token = expect(ID);
+    std::string name = id_token.lexeme;
+    int line = id_token.line_no;
+    poly_decl_lines[name].push_back(line);
     Token t = lexer.peek(1);
     if (t.token_type == LPAREN) {
         expect(LPAREN);

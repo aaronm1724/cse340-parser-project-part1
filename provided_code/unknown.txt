@@ -1,7 +1,0 @@
-TASKS
-1
-POLY
-F = x + 3;
-hello         // ⛔ “hello” is not a valid section or token
-INPUTS
-1

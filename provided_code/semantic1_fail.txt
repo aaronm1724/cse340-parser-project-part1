@@ -1,0 +1,16 @@
+TASKS
+1 2 3
+POLY
+F1 = x^2 + 1;
+F2 = x^2 + 3;
+F1 = x + 5;
+G(X,Y) = X Y + Y;
+F1 = X^3 + Y;
+EXECUTE
+INPUT Z;
+X = F1;
+Y = G(Z,Z);
+OUTPUT X;
+OUTPUT Y;
+INPUTS
+1 2 3
