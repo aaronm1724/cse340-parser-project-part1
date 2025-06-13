@@ -6,9 +6,9 @@ F2(A, B) = A + B;
 F3 = x^2 + 1;
 EXECUTE
 INPUT X;
-Y = F1(X, X);      // line 9: too many args
-Z = F2(X);         // line 10: too few args
-W = F3(X);         // line 11: should not take any args
+Y = F1(X, X);
+Z = F2(X);
+W = F3(X); 
 OUTPUT Y;
 OUTPUT Z;
 OUTPUT W;
