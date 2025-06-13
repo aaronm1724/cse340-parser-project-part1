@@ -1,0 +1,5 @@
+TASKS
+1
+POLY
+F = x^2 + 1;
+OUTPUT X;

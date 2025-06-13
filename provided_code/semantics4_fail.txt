@@ -1,9 +1,0 @@
-TASKS
-1
-POLY
-f = 1;
-g = 2;
-EXECUTE
-f = f + 1;
-INPUTS
-1

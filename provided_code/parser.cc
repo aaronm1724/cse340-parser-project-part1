@@ -42,56 +42,147 @@ void Parser::parse_program()
 {
     parse_tasks_section();
     parse_poly_section();
-    parse_execute_section();
-    parse_inputs_section();
+    // parse_execute_section();
+    //parse_inputs_section();
     expect(END_OF_FILE);
-    for (const auto& entry : symbol_table) {
-        const std::string& id = entry.first;
-        const Symbol& symbol = entry.second;
-
-        if (symbol.type == POLY_TYPE && !symbol.used_in_expr) {
-            cout << "Semantic Error Code 4: " << symbol.line_declared << "\n";
-            exit(1);
-        }
-    }
 }
 
 void Parser::parse_tasks_section() {
     expect(TASKS);
+    parse_num_list();
+}
 
+void Parser::parse_num_list() {
+    expect(NUM);
     Token t = lexer.peek(1);
-    while (t.token_type == NUM) {
-        lexer.GetToken();
-        t = lexer.peek(1);
+    if (t.token_type == NUM) {
+        parse_num_list();
     }
 }
 
 void Parser::parse_poly_section() {
     expect(POLY);
+    parse_poly_decl_list();
+}
 
+void Parser::parse_poly_decl_list() {
+    parse_poly_decl();
     Token t = lexer.peek(1);
-    while (t.token_type == ID) {
-        Token id_token = expect(ID);
-        std::string id_name = id_token.lexeme;
-
-        if (symbol_table.find(id_name) != symbol_table.end()) {
-            int original_line = symbol_table[id_name].line_declared;
-            int duplicate_line = id_token.line_no;
-            cout << "Semantic Error Code 1: " << original_line << " " << duplicate_line << "\n";
-            exit(1);
-        }
-
-        symbol_table[id_name] = {POLY_TYPE, false, id_token.line_no};
-
-        Token m = lexer.GetToken();
-        while (m.token_type != SEMICOLON) {
-            if (m.token_type == END_OF_FILE) syntax_error();
-            m = lexer.GetToken();
-        }
-
-        t = lexer.peek(1);
+    if (t.token_type == ID) {
+        parse_poly_decl_list();
+    } else if (t.token_type != EXECUTE) {
+        syntax_error();
     }
 }
+
+void Parser::parse_poly_decl() {
+    parse_poly_header();
+    expect(EQUAL);
+    parse_poly_body();
+    expect(SEMICOLON);
+}
+
+void Parser::parse_poly_header() {
+    Token id_token = expect(ID);
+    Token t = lexer.peek(1);
+    if (t.token_type == LPAREN) {
+        expect(LPAREN);
+        parse_id_list();
+        expect(RPAREN);
+    }
+}
+
+void Parser::parse_id_list() {
+    expect(ID);
+    Token t = lexer.peek(1);
+    if (t.token_type == COMMA) {
+        expect(COMMA);
+        parse_id_list();
+    }
+}
+
+void Parser::parse_poly_body() {
+    parse_term_list();
+}
+
+void Parser::parse_term_list() {
+    parse_term();
+    Token t = lexer.peek(1);
+    if (t.token_type == PLUS || t.token_type == MINUS) {
+        parse_add_operator();
+        parse_term_list();
+    }
+}
+
+void Parser::parse_add_operator() {
+    Token t = lexer.peek(1);
+    if (t.token_type == PLUS) {
+        expect(PLUS);
+    } else if (t.token_type == MINUS) {
+        expect(MINUS);
+    } else {
+        syntax_error();
+    }
+}
+
+void Parser::parse_term() {
+    Token t = lexer.peek(1);
+    if (t.token_type == NUM) {
+        parse_coefficient();
+        t = lexer.peek(1);
+        if (t.token_type == ID || t.token_type == LPAREN) {
+            parse_monomial_list();
+        }
+    } else if (t.token_type == ID || t.token_type == LPAREN) {
+        parse_monomial_list();
+    } else {
+        syntax_error();
+    }
+}
+
+void Parser::parse_monomial_list() {
+    Token t = lexer.peek(1);
+    if (t.token_type == ID || t.token_type == LPAREN) {
+        parse_monomial();
+        parse_monomial_list();
+    }
+}
+
+void Parser::parse_monomial() {
+    Token t = lexer.peek(1);
+    if (t.token_type == ID || t.token_type == LPAREN) {
+        parse_primary();
+        t = lexer.peek(1);
+        if (t.token_type == POWER) {
+            parse_exponent();
+        }
+    } else {
+        syntax_error();
+    }
+}
+
+void Parser::parse_coefficient() {
+    expect(NUM);
+}
+
+void Parser::parse_exponent() {
+    expect(POWER);
+    expect(NUM);
+}
+
+void Parser::parse_primary() {
+    Token t = lexer.peek(1);
+    if (t.token_type == ID) {
+        expect(ID);
+    } else if (t.token_type == LPAREN) {
+        expect(LPAREN);
+        parse_term_list();
+        expect(RPAREN);
+    } else {
+        syntax_error();
+    }
+}
+
 
 void Parser::parse_execute_section() {
     expect(EXECUTE);
@@ -100,101 +191,10 @@ void Parser::parse_execute_section() {
 }
 
 void Parser::parse_statement_list() {
-    parse_statement();
-
-    Token t = lexer.peek(1);
-    if (t.token_type == INPUT || t.token_type == OUTPUT || t.token_type ==ID) {
-        parse_statement_list();
-    }
+    
 }
 
 void Parser::parse_statement() {
-    //cout << "[DEBUG] Entering parse_statement(), peek = " << lexer.peek(1).lexeme << "\n";
-    Token t = lexer.peek(1);
-    if (t.token_type == ID) {
-        //cout << "[DEBUG] In parse_statement(), next token: " << lexer.peek(1).lexeme << "\n";
-        Token lhs = expect(ID);
-        std::string id = lhs.lexeme;
-        current_assignment_lhs = id;
-        expect(EQUAL);
-        parse_expr();
-        expect(SEMICOLON);
-    } else if (t.token_type == INPUT) {
-        cout << "[DEBUG] Parsing INPUT statement\n";
-        expect(INPUT);
-        Token id_token = expect(ID);
-        std::string id = id_token.lexeme;
-        if (symbol_table.find(id) != symbol_table.end()) {
-            cout << "ERROR: Redeclaration of identifier " << id << "\n";
-            exit(1);
-        }
-        symbol_table[id] = {INPUT_TYPE, false, id_token.line_no};
-        expect(SEMICOLON);
-        current_assignment_lhs.clear();
-    } else if (t.token_type == OUTPUT) {
-        //cout << "[DEBUG] Parsing OUTPUT statement\n";
-        expect(OUTPUT);
-        Token id_token = expect(ID);
-        std::string id = id_token.lexeme;
-        if (symbol_table.find(id) == symbol_table.end()) {
-            cout << "ERROR: Undeclared identifier " << id << "\n";
-            exit(1);
-        }
-        symbol_table[id].used_in_expr = true;
-        expect(SEMICOLON);
-    } else {
-        syntax_error();
-    }
-}
-
-void Parser::parse_expr() {
-    //cout << "[DEBUG] Entered parse_expr()\n";
-    parse_term();
-
-    Token t = lexer.peek(1);
-    while (t.token_type == PLUS || t.token_type == MINUS) {
-        lexer.GetToken();
-        parse_term();
-        t = lexer.peek(1);
-    }
-}
-
-void Parser::parse_term() {
-    //cout << "[DEBUG] Entered parse_term()\n";
-    parse_factor();
-    
-    Token t = lexer.peek(1);
-    if (t.token_type == POWER) {
-        lexer.GetToken();
-        expect(NUM);
-    }
-}
-
-void Parser::parse_factor() {
-    //cout << "[DEBUG] Entered parse_factor()\n";
-    Token t = lexer.peek(1);
-    if (t.token_type == ID) {
-        Token id_token = expect(ID);
-        std::string id = id_token.lexeme;
-
-        if (symbol_table.find(id) == symbol_table.end()) {
-            cout << "Semantic Error Code 3: " << id_token.line_no << "\n";
-            exit(1);
-        }
-
-        if (!current_assignment_lhs.empty() &&  id == current_assignment_lhs && symbol_table[id].type == POLY_TYPE) {
-            cout << "Semantic Error Code 2: " << id_token.line_no << "\n";
-            exit(1);
-        }
-    } else if (t.token_type == NUM) {
-        expect(NUM);
-    } else if (t.token_type == LPAREN) {
-        expect(LPAREN);
-        parse_expr();
-        expect(RPAREN);
-    } else {
-        syntax_error();
-    }
 }
 
 void Parser::parse_inputs_section() {
