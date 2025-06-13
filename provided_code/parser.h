@@ -11,8 +11,6 @@
 #include <map>
 #include <string>
 
-std::map<std::string, std::vector<int>> poly_decl_lines;
-
 class Parser {
   public:
     void parse_program();
@@ -22,6 +20,13 @@ class Parser {
     void syntax_error();
     Token expect(TokenType expected_type);
 
+    // ====== Internal state for semantic checks ======
+    std::map<std::string, std::vector<int>> poly_decl_lines;
+    std::string current_poly;
+    std::map<std::string, std::vector<std::string>> poly_params;
+    std::vector<int> invalid_lines;
+
+    // ====== Parser methods ======
     void parse_tasks_section();
     void parse_num_list();
     void parse_poly_section();
@@ -29,7 +34,7 @@ class Parser {
     void parse_poly_decl();
     void parse_poly_header();
     void parse_poly_name();
-    void parse_id_list();
+    std::vector<std::string> parse_id_list();
     void parse_poly_body();
     void parse_term_list();
     void parse_term();

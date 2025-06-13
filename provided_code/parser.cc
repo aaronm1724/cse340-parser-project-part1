@@ -80,6 +80,16 @@ void Parser::parse_poly_section() {
         std::cout << std::endl;
         exit(0);
     }
+
+    if (!invalid_lines.empty()) {
+        std::sort(invalid_lines.begin(), invalid_lines.end());
+        std::cout << "Semantic Error Code 2:";
+        for (int line : invalid_lines) {
+            std::cout << " " << line;
+        }
+        std::cout << std::endl;
+        exit(0);
+    }
 }
 
 void Parser::parse_poly_decl_list() {
@@ -104,21 +114,29 @@ void Parser::parse_poly_header() {
     std::string name = id_token.lexeme;
     int line = id_token.line_no;
     poly_decl_lines[name].push_back(line);
+
+    current_poly = name;
+
     Token t = lexer.peek(1);
     if (t.token_type == LPAREN) {
         expect(LPAREN);
-        parse_id_list();
+        expect(ID);
+        poly_params[current_poly] = parse_id_list();
         expect(RPAREN);
     }
 }
 
-void Parser::parse_id_list() {
-    expect(ID);
-    Token t = lexer.peek(1);
-    if (t.token_type == COMMA) {
+std::vector<std::string> Parser::parse_id_list() {
+    std::vector<std::string> params;
+    Token id_token = expect(ID);
+    params.push_back(id_token.lexeme);
+
+    while (lexer.peek(1).token_type == COMMA) {
         expect(COMMA);
-        parse_id_list();
+        Token next_id = expect(ID);
+        params.push_back(next_id.lexeme);
     }
+    return params;
 }
 
 void Parser::parse_poly_body() {
@@ -193,7 +211,18 @@ void Parser::parse_exponent() {
 void Parser::parse_primary() {
     Token t = lexer.peek(1);
     if (t.token_type == ID) {
-        expect(ID);
+        Token id_token = expect(ID);
+        std::string var_name = id_token.lexeme;
+        if (poly_params.find(current_poly) != poly_params.end()) {
+            std::vector<std::string> allowed_vars = poly_params[current_poly];
+            if (std::find(allowed_vars.begin(), allowed_vars.end(), var_name) == allowed_vars.end()) {
+                invalid_lines.push_back(id_token.line_no);
+            }
+        } else {
+            if (var_name != "x") {
+                invalid_lines.push_back(id_token.line_no);
+            }
+        }
     } else if (t.token_type == LPAREN) {
         expect(LPAREN);
         parse_term_list();

@@ -1,0 +1,13 @@
+TASKS
+1
+POLY
+F1 = y^2 + x;
+F2(A, B) = A^2 + C;
+EXECUTE
+INPUT Z;
+X = F1;
+Y = F2(Z,Z);
+OUTPUT X;
+OUTPUT Y;
+INPUTS
+1 2
