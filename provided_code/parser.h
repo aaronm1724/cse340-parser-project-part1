@@ -59,6 +59,8 @@ struct poly_eval_t {
 class Parser {
   public:
     void parse_program();
+    void execute_program();
+
 
   private:
     LexicalAnalyzer lexer;
@@ -111,7 +113,6 @@ class Parser {
     std::vector<std::string> parse_argument_list();
     void parse_argument(std::vector<std::string>& args);
     void parse_inputs_section();
-    void execute_program();
     int evaluate_poly(poly_body_t* body, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
     int evaluate_term(term_t* term, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
     int evaluate_monomial(monomial_t* monomial, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
