@@ -153,15 +153,19 @@ poly_body_t* Parser::parse_poly_body() {
 }
 
 term_list_t* Parser::parse_term_list() {
+    OperatorType leading_op = OP_NONE;
+    Token t1 = lexer.peek(1);
+    if (t1.token_type == PLUS || t1.token_type == MINUS) {
+        leading_op = parse_add_operator();
+    }
     term_t* first_term = parse_term();
     term_list_t* node = new term_list_t;
     node->term = first_term;
-    Token t = lexer.peek(1);
-    if (t.token_type == PLUS || t.token_type == MINUS) {
-        node->op = parse_add_operator();
+    node->op = leading_op;
+    Token t2 = lexer.peek(1);
+    if (t2.token_type == PLUS || t2.token_type == MINUS) {
         node->next = parse_term_list();
     } else {
-        node->op = OP_NONE;
         node->next = nullptr;
     }
     return node;
