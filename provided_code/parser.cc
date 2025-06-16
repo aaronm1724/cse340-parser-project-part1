@@ -519,6 +519,7 @@ void Parser::execute_program() {
                 break;
             }
             case STMT_OUTPUT: {
+                std::cerr << "[debug] outputting value of " << current->var << ": " << memory[current->var] << std::endl;
                 std::cout << memory[current->var] << std::endl;
                 break;
             }
@@ -527,7 +528,7 @@ void Parser::execute_program() {
                 std::string poly_name = eval->name;
                 std::vector<std::string> args = eval->args;
                 current_poly = poly_name;
-
+                std::cerr << "[debug] about to assign to " << current->lhs << " using poly: " << poly_name << " on line " << current->line_no << "\n";
                 std::map<std::string, int> arg_values;
                 const std::vector<std::string>& params = poly_params[poly_name];
                 if (params.size() != args.size()) {
@@ -544,6 +545,7 @@ void Parser::execute_program() {
                         if (location_table.find(actual) == location_table.end()) {
                             location_table[actual] = next_available++;
                         }
+                        std::cerr << "[debug] checking value of arg '" << actual << "': " << memory[location_table[actual]] << std::endl;
                         value = memory[location_table[actual]];
                     }
                     std::cerr << "[debug] assigning param " << expected << " = " << value << " from actual arg '" << actual << "'\n";
