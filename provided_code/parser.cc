@@ -133,6 +133,8 @@ void Parser::parse_poly_header() {
         expect(LPAREN);
         poly_params[current_poly] = parse_id_list();
         expect(RPAREN);
+    } else {
+        poly_params[current_poly] = {"x"};
     }
 }
 
