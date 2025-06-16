@@ -90,9 +90,9 @@ class Parser {
     std::map<std::string, poly_body_t*> poly_bodies;
     // ====== Task 3 ====== 
     std::set<std::string> initialized_vars;
-    std::set<int> warning_lines_uninitialized;
+    std::vector<int> warning_lines_uninitialized;
     // ====== Task 4 ======
-    std::set<int> useless_assignments;
+    std::vector<int> useless_assignments;
 
     // ====== Parser methods ======
     void parse_tasks_section();
