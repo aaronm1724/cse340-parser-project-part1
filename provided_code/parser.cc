@@ -560,4 +560,5 @@ int main()
     Parser parser;
 
     parser.parse_program();
+    parser.execute_program();
 }
