@@ -164,6 +164,7 @@ term_list_t* Parser::parse_term_list() {
         node->op = OP_NONE;
         node->next = nullptr;
     }
+    return node;
 }
 
 OperatorType Parser::parse_add_operator() {
@@ -491,7 +492,7 @@ void Parser::execute_program() {
     }
 }
 
-int evaluate_poly(poly_body_t* body, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
+int Parser::evaluate_poly(poly_body_t* body, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
     int result = 0;
     term_list_t* current_term = body->terms;
     while (current_term != nullptr) {
@@ -509,7 +510,7 @@ int evaluate_poly(poly_body_t* body, const std::map<std::string, int>& arg_value
     return result;
 }
 
-int evaluate_term(term_t* term, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
+int Parser::evaluate_term(term_t* term, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
     int product = 1;
     for (monomial_t* monomial : term->monomial_list) {
         product *= evaluate_monomial(monomial, arg_values, location_table);
@@ -518,7 +519,7 @@ int evaluate_term(term_t* term, const std::map<std::string, int>& arg_values, co
     return term->coefficient * product;
 }
 
-int evaluate_monomial(monomial_t* monomial, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) { 
+int Parser::evaluate_monomial(monomial_t* monomial, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) { 
     int base = evaluate_primary(monomial->primary, arg_values, location_table);
     int exponent = monomial->exponent;
     int result = 1;
@@ -528,7 +529,7 @@ int evaluate_monomial(monomial_t* monomial, const std::map<std::string, int>& ar
     return result;
 }
 
-int evaluate_primary(primary_t* primary, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
+int Parser::evaluate_primary(primary_t* primary, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
     if (primary->kind == VAR) {
         for (const auto& pair : arg_values) {
             if (location_table.at(pair.first) == primary->var_index) {
