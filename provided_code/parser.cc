@@ -320,7 +320,6 @@ void Parser::parse_execute_section() {
 
     if (task_numbers.count(3)) {
         if (!warning_lines_uninitialized.empty()) {
-        std::sort(warning_lines_uninitialized.begin(), warning_lines_uninitialized.end());
         std::cout << "Warning Code 1:";
         for (int line : warning_lines_uninitialized) {
             std::cout << " " << line;
@@ -478,7 +477,7 @@ void Parser::parse_argument(std::vector<std::string>& args) {
             args.push_back(t3.lexeme);
 
             if (initialized_vars.find(t3.lexeme) == initialized_vars.end()) {
-                warning_lines_uninitialized.push_back(t3.line_no);
+                warning_lines_uninitialized.insert(t3.line_no);
             }
         }
     } else {
@@ -635,7 +634,7 @@ void Parser::check_useless_assignments() {
             }
 
             if (!lhs_name.empty() && used_vars.find(lhs_name) == used_vars.end()) {
-                useless_assignments.push_back(stmt->line_no);
+                useless_assignments.insert(stmt->line_no);
             } else {
                 used_vars.erase(lhs_name);
             }
@@ -648,7 +647,6 @@ void Parser::check_useless_assignments() {
             }
         }
     }
-    std::sort(useless_assignments.begin(), useless_assignments.end());
 }
 // ====== INPUTS Section ======
 void Parser::parse_inputs_section() {
