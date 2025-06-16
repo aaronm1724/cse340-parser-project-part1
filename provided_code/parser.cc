@@ -318,13 +318,15 @@ void Parser::parse_execute_section() {
         }
     }
 
-    if (!warning_lines_uninitialized.empty()) {
+    if (task_numbers.count(3)) {
+        if (!warning_lines_uninitialized.empty()) {
         std::sort(warning_lines_uninitialized.begin(), warning_lines_uninitialized.end());
         std::cout << "Warning Code 1:";
         for (int line : warning_lines_uninitialized) {
             std::cout << " " << line;
+            }
+            std::cout << std::endl;
         }
-        std::cout << std::endl;
     }
 }
 
