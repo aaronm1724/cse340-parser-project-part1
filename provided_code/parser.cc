@@ -421,6 +421,10 @@ stmt_t* Parser::parse_assign_statement() {
     if (task_numbers.count(3)) {
         std::cerr << "[debug] args on line " << lhs_token.line_no << ": ";
         for (const std::string& arg : eval->args) {
+            std::cerr << arg << " ";
+        }
+        std::cerr << std::endl;
+        for (const std::string& arg : eval->args) {
             if (arg == lhs_name) continue;
             if (initialized_vars.find(arg) == initialized_vars.end()) {
                 std::cerr << "[debug] Warning Code 1: '" << arg << "' used uninitialized on line " << lhs_token.line_no << std::endl;
