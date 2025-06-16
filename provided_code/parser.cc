@@ -419,6 +419,7 @@ stmt_t* Parser::parse_assign_statement() {
     stmt_t* stmt = new stmt_t;
     stmt->type = STMT_ASSIGN;
     if (task_numbers.count(3)) {
+        std::cerr << "[debug] args on line " << lhs_token.line_no << ": ";
         for (const std::string& arg : eval->args) {
             if (arg == lhs_name) continue;
             if (initialized_vars.find(arg) == initialized_vars.end()) {
