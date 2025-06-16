@@ -11,6 +11,7 @@
 #include <map>
 #include <string>
 #include <vector>
+#include <set>
 
 enum StmtType { STMT_INPUT, STMT_OUTPUT, STMT_ASSIGN };
 enum PrimaryKind { VAR, TERM_LIST };
@@ -60,6 +61,8 @@ class Parser {
   public:
     void parse_program();
     void execute_program();
+    std::set<int> task_numbers;
+
 
 
   private:
@@ -84,6 +87,9 @@ class Parser {
     int input_counter = 0;
     bool in_inputs_section = false;
     std::map<std::string, poly_body_t*> poly_bodies;
+    // ====== Task 3 ====== 
+    std::set<std::string> initialized_vars;
+    std::vector<int> warning_lines_uninitialized;
 
     // ====== Parser methods ======
     void parse_tasks_section();

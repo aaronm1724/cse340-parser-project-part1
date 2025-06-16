@@ -17,6 +17,7 @@ using namespace std;
 // ====== Utility Functions ======
 void Parser::syntax_error()
 {
+    if (!task_numbers.count(1)) return;
     cout << "SYNTAX ERROR !!!!!&%!!\n";
     exit(1);
 }
@@ -55,6 +56,7 @@ void Parser::parse_tasks_section() {
 
 void Parser::parse_num_list() {
     Token num_token = expect(NUM);
+    task_numbers.insert(std::stoi(num_token.lexeme));
     if (in_inputs_section) {
         input_values.push_back(std::stoi(num_token.lexeme));
     }
@@ -78,23 +80,25 @@ void Parser::parse_poly_section() {
         }
     }
 
-    if (!duplicates.empty()) {
-        std::cout << "Semantic Error Code 1:";
-        for (int line : duplicates) {
-            std::cout << " " << line;
+    if (task_numbers.count(1)) {
+        if (!duplicates.empty()) {
+            std::cout << "Semantic Error Code 1:";
+            for (int line : duplicates) {
+                std::cout << " " << line;
+            }
+            std::cout << std::endl;
+            exit(0);
         }
-        std::cout << std::endl;
-        exit(0);
-    }
 
-    if (!invalid_lines.empty()) {
-        std::sort(invalid_lines.begin(), invalid_lines.end());
-        std::cout << "Semantic Error Code 2:";
-        for (int line : invalid_lines) {
-            std::cout << " " << line;
+        if (!invalid_lines.empty()) {
+            std::sort(invalid_lines.begin(), invalid_lines.end());
+            std::cout << "Semantic Error Code 2:";
+            for (int line : invalid_lines) {
+                std::cout << " " << line;
+            }
+            std::cout << std::endl;
+            exit(0);
         }
-        std::cout << std::endl;
-        exit(0);
     }
 }
 
@@ -292,24 +296,35 @@ void Parser::parse_execute_section() {
         syntax_error();
     } 
 
-    if (!undeclared_eval_lines.empty()) {
-        std::sort(undeclared_eval_lines.begin(), undeclared_eval_lines.end());
-        std::cout << "Semantic Error Code 3:";
-        for (int line : undeclared_eval_lines) {
-            std::cout << " " << line;
+    if (task_numbers.count(1)) {
+        if (!undeclared_eval_lines.empty()) {
+            std::sort(undeclared_eval_lines.begin(), undeclared_eval_lines.end());
+            std::cout << "Semantic Error Code 3:";
+            for (int line : undeclared_eval_lines) {
+                std::cout << " " << line;
+            }
+            std::cout << std::endl;
+            exit(0);
         }
-        std::cout << std::endl;
-        exit(0);
+
+        if (!wrong_arity_lines.empty()) {
+            std::sort(wrong_arity_lines.begin(), wrong_arity_lines.end());
+            std::cout << "Semantic Error Code 4:";
+            for (int line : wrong_arity_lines) {
+                std::cout << " " << line;
+            }
+            std::cout << std::endl;
+            exit(0);
+        }
     }
 
-    if (!wrong_arity_lines.empty()) {
-        std::sort(wrong_arity_lines.begin(), wrong_arity_lines.end());
-        std::cout << "Semantic Error Code 4:";
-        for (int line : wrong_arity_lines) {
+    if (!warning_lines_uninitialized.empty()) {
+        std::sort(warning_lines_uninitialized.begin(), warning_lines_uninitialized.end());
+        std::cout << "Warning Code 1:";
+        for (int line : warning_lines_uninitialized) {
             std::cout << " " << line;
         }
         std::cout << std::endl;
-        exit(0);
     }
 }
 
@@ -348,6 +363,7 @@ stmt_t* Parser::parse_input_statement() {
     std::string var_name = id_token.lexeme;
     if (location_table.find(var_name) == location_table.end()) {
         location_table[var_name] = next_available++;
+        initialized_vars.insert(var_name);
     }
 
     stmt_t* stmt = new stmt_t;
@@ -384,6 +400,7 @@ stmt_t* Parser::parse_assign_statement() {
 
     stmt_t* stmt = new stmt_t;
     stmt->type = STMT_ASSIGN;
+    initialized_vars.insert(lhs_name);
     stmt->lhs = location_table[lhs_name];
     stmt->eval = eval;
     return stmt;
@@ -442,6 +459,10 @@ void Parser::parse_argument(std::vector<std::string>& args) {
         } else {
             Token t3 = expect(ID);
             args.push_back(t3.lexeme);
+
+            if (initialized_vars.find(t3.lexeme) == initialized_vars.end()) {
+                warning_lines_uninitialized.push_back(t3.line_no);
+            }
         }
     } else {
         syntax_error();
@@ -582,5 +603,7 @@ int main()
     Parser parser;
 
     parser.parse_program();
-    parser.execute_program();
+    if (parser.task_numbers.count(2)) {
+        parser.execute_program();
+    }
 }
