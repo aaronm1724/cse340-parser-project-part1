@@ -319,6 +319,10 @@ void Parser::parse_execute_section() {
         }
     }
 
+    if (task_numbers.count(2)) {
+        execute_program();
+    }
+
     if (task_numbers.count(3)) {
         if (!warning_lines_uninitialized.empty()) {
         std::sort(warning_lines_uninitialized.begin(), warning_lines_uninitialized.end());
@@ -678,7 +682,4 @@ int main()
     Parser parser;
 
     parser.parse_program();
-    if (parser.task_numbers.count(2)) {
-        parser.execute_program();
-    }
 }
