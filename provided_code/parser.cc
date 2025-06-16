@@ -418,7 +418,6 @@ stmt_t* Parser::parse_assign_statement() {
 
     stmt_t* stmt = new stmt_t;
     stmt->type = STMT_ASSIGN;
-    initialized_vars.insert(lhs_name);
     if (task_numbers.count(3)) {
         for (const std::string& arg : eval->args) {
             if (arg == lhs_name) continue;
@@ -428,6 +427,7 @@ stmt_t* Parser::parse_assign_statement() {
             }
         }
     }
+    initialized_vars.insert(lhs_name);
     stmt->lhs = location_table[lhs_name];
     stmt->eval = eval;
     stmt->line_no = lhs_token.line_no;
