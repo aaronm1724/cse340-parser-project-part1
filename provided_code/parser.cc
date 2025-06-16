@@ -32,7 +32,7 @@ void Parser::syntax_error()
 Token Parser::expect(TokenType expected_type)
 {
     Token t = lexer.GetToken();
-    std::cout << "[expect] got token: " << t.lexeme << " (type: " << t.token_type << "), expected: " << expected_type << std::endl;
+    // std::cout << "[expect] got token: " << t.lexeme << " (type: " << t.token_type << "), expected: " << expected_type << std::endl;
     if (t.token_type != expected_type)
         syntax_error();
     return t;
@@ -425,6 +425,7 @@ stmt_t* Parser::parse_assign_statement() {
         }
         std::cerr << std::endl;
         for (const std::string& arg : eval->args) {
+            std::cerr << "[trace] checking arg '" << arg << "' on line " << lhs_token.line_no << std::endl;
             if (arg == lhs_name) continue;
             if (initialized_vars.find(arg) == initialized_vars.end()) {
                 std::cerr << "[debug] Warning Code 1: '" << arg << "' used uninitialized on line " << lhs_token.line_no << std::endl;
