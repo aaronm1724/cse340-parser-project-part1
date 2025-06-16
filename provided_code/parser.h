@@ -34,6 +34,9 @@ class Parser {
     int next_available = 0;
     int next_input = 0;
     stmt_t* stmt_list_head = nullptr;
+    std::vector<int> input_values;
+    int input_counter = 0;
+    bool in_inputs_section = false;
 
     // ====== Parser methods ======
     void parse_tasks_section();
@@ -63,6 +66,7 @@ class Parser {
     std::vector<std::string> parse_argument_list();
     void parse_argument(std::vector<std::string>& args);
     void parse_inputs_section();
+    void execute_program();
 };
 
 #endif

@@ -69,7 +69,11 @@ void Parser::parse_tasks_section() {
 }
 
 void Parser::parse_num_list() {
-    expect(NUM);
+    Token num_token = expect(NUM);
+    if (in_inputs_section) {
+        input_values.push_back(std::stoi(num_token.lexeme));
+    }
+
     Token t = lexer.peek(1);
     if (t.token_type == NUM) {
         parse_num_list();
@@ -420,7 +424,9 @@ void Parser::parse_argument(std::vector<std::string>& args) {
 // ====== INPUTS Section ======
 void Parser::parse_inputs_section() {
     expect(INPUTS);
+    in_inputs_section = true;
     parse_num_list();
+    in_inputs_section = false;
 }
 
 int main()
