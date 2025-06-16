@@ -509,11 +509,11 @@ void Parser::execute_program() {
     while (current != nullptr) {
         switch (current->type) {
             case STMT_INPUT: {
-                if (input_counter >= input_values.size()) {
-                    std::cerr << "[fatal] not enough input values\n";
-                    exit(1);
+                int value = 0;
+                if (input_counter < input_values.size()) {
+                    value = input_values[input_counter++];
                 }
-                memory[current->var] = input_values[input_counter++];
+                memory[current->var] = value;
                 break;
             }
             case STMT_OUTPUT: {
