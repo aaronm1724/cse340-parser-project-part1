@@ -552,6 +552,10 @@ void Parser::execute_program() {
                     arg_values[params[i]] = value;
                 }
                 memory[current->lhs] = evaluate_poly(poly_bodies[poly_name], arg_values, location_table);
+                std::cerr << "[debug] wrote value " << memory[current->lhs] 
+                << " to memory for var " << current->lhs 
+                << " after poly " << poly_name 
+                << " on line " << current->line_no << "\n";
                 break;
             }
         }
