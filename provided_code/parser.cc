@@ -507,17 +507,22 @@ int Parser::evaluate_poly(poly_body_t* body, const std::map<std::string, int>& a
     int result = 0;
     term_list_t* current_term = body->terms;
     while (current_term != nullptr) {
+        std::cout << "[debug] term start\n";
         term_t* term = current_term->term;
         int term_value = evaluate_term(term, arg_values, location_table);
+        std::cout << "[debug] evaluated term value = " << term_value << std::endl;
 
         if (current_term->op == OP_PLUS || current_term->op == OP_NONE) {
+            std::cout << "[debug] adding term value to result\n";
             result += term_value;
         } else if (current_term->op == OP_MINUS) {
+            std::cout << "[debug] subtracting term value from result\n";
             result -= term_value;
         }
 
         current_term = current_term->next;
     }
+    std::cout << "[debug] final result = " << result << std::endl;
     return result;
 }
 
