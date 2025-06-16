@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include "parser.h"
 #include <algorithm>
+#include <unordered_set>
 
 using namespace std;
 
@@ -417,6 +418,15 @@ stmt_t* Parser::parse_assign_statement() {
     stmt_t* stmt = new stmt_t;
     stmt->type = STMT_ASSIGN;
     initialized_vars.insert(lhs_name);
+    if (task_numbers.count(3)) {
+        for (const std::string& arg : eval->args) {
+            if (arg == lhs_name) continue;
+            if (initialized_vars.find(arg) == initialized_vars.end()) {
+                std::cerr << "[debug] Warning Code 1: '" << arg << "' used uninitialized on line " << lhs_token.line_no << std::endl;
+                warning_lines_uninitialized.push_back(lhs_token.line_no);
+            }
+        }
+    }
     stmt->lhs = location_table[lhs_name];
     stmt->eval = eval;
     stmt->line_no = lhs_token.line_no;
@@ -476,10 +486,6 @@ void Parser::parse_argument(std::vector<std::string>& args) {
         } else {
             Token t3 = expect(ID);
             args.push_back(t3.lexeme);
-
-            if (initialized_vars.find(t3.lexeme) == initialized_vars.end()) {
-                warning_lines_uninitialized.push_back(t3.line_no);
-            }
         }
     } else {
         syntax_error();
