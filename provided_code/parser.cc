@@ -331,7 +331,6 @@ void Parser::parse_execute_section() {
     if (task_numbers.count(4)) {
         check_useless_assignments();
         if (!useless_assignments.empty()) {
-            std::sort(useless_assignments.begin(), useless_assignments.end());
             std::cout << "Warning Code 2:";
             for (int line : useless_assignments) {
                 std::cout << " " << line;
