@@ -2,7 +2,7 @@ TASKS
 1 2
 
 POLY
-P(x) = (z + 1)^2;
+P(x) = (x + 1)^2;
 Q(x) = x^2 - 4x + 7;
 
 EXECUTE
