@@ -14,21 +14,6 @@
 
 using namespace std;
 
-enum StmtType { STMT_INPUT, STMT_OUTPUT, STMT_ASSIGN };
-
-struct stmt_t {
-    StmtType type;
-    int var = -1;
-    int lhs = -1;
-    void* eval = nullptr;
-    stmt_t* next = nullptr;
-};
-
-struct poly_eval_t {
-    std::string name;
-    std::vector<std::string> args;
-};
-
 // ====== Utility Functions ======
 void Parser::syntax_error()
 {
@@ -418,6 +403,54 @@ void Parser::parse_argument(std::vector<std::string>& args) {
         }
     } else {
         syntax_error();
+    }
+}
+
+void Parser::execute_program() {
+    std::fill(memory.begin(), memory.end(), 0);
+    stmt_t* current = stmt_list_head;
+    input_counter = 0;
+
+    while (current != nullptr) {
+        switch (current->type) {
+            case STMT_INPUT: {
+                if (input_counter >= input_values.size()) {
+                    std::cerr << "[fatal] not enough input values\n";
+                    exit(1);
+                }
+                memory[current->var] = input_values[input_counter++];
+                break;
+            }
+            case STMT_OUTPUT: {
+                std::cout << memory[current->var] << std::endl;
+                break;
+            }
+            case STMT_ASSIGN: {
+                poly_eval_t* eval = static_cast<poly_eval_t*>(current->eval);
+                std::string poly_name = eval->name;
+                std::vector<std::string> args = eval->args;
+
+                std::map<std::string, int> arg_values;
+                const std::vector<std::string>& params = poly_params[poly_name];
+                for (size_t i = 0; i < args.size(); ++i) {
+                    const std::string& actual = args[i];
+                    int value;
+                    if (isdigit(actual[0]) || (actual[0] == '-' && actual.length() > 1)) {
+                        value = std::stoi(actual);
+                    } else {
+                        if (location_table.find(actual) == location_table.end()) {
+                            std::cerr << "[fatal] variable " << actual << " not declared\n";
+                            exit(1);
+                        }
+                        value = memory[location_table[actual]];
+                    }
+                    arg_values[params[i]] = value;
+                }
+                memory[current->lhs] = 0;
+                break;
+            }
+        }
+        current = current->next;
     }
 }
 

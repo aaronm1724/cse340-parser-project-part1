@@ -11,6 +11,24 @@
 #include <map>
 #include <string>
 #include <vector>
+
+struct poly_eval_t;
+
+enum StmtType { STMT_INPUT, STMT_OUTPUT, STMT_ASSIGN };
+
+struct stmt_t {
+    StmtType type;
+    int var = -1;
+    int lhs = -1;
+    void* eval = nullptr;
+    stmt_t* next = nullptr;
+};
+
+struct poly_eval_t {
+    std::string name;
+    std::vector<std::string> args;
+};
+
 class Parser {
   public:
     void parse_program();
@@ -34,7 +52,6 @@ class Parser {
     int next_available = 0;
     int next_input = 0;
     stmt_t* stmt_list_head = nullptr;
-    std::vector<int> input_values;
     int input_counter = 0;
     bool in_inputs_section = false;
 
