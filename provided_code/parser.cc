@@ -328,6 +328,18 @@ void Parser::parse_execute_section() {
             std::cout << std::endl;
         }
     }
+
+    if (task_numbers.count(4)) {
+        check_useless_assignments();
+        if (!useless_assignments.empty()) {
+            std::sort(useless_assignments.begin(), useless_assignments.end());
+            std::cout << "Warning Code 2:";
+            for (int line : useless_assignments) {
+                std::cout << " " << line;
+            }
+            std::cout << std::endl;
+        }
+    }
 }
 
 stmt_t* Parser::parse_statement_list() {
@@ -371,6 +383,7 @@ stmt_t* Parser::parse_input_statement() {
     stmt_t* stmt = new stmt_t;
     stmt->type = STMT_INPUT;
     stmt->var = location_table[var_name];
+    stmt->line_no = id_token.line_no;
     return stmt;
 }
 
@@ -387,6 +400,7 @@ stmt_t* Parser::parse_output_statement() {
     stmt_t* stmt = new stmt_t;
     stmt->type = STMT_OUTPUT;
     stmt->var = location_table[var_name];
+    stmt->line_no = id_token.line_no;
     return stmt;
 }
 
@@ -405,6 +419,7 @@ stmt_t* Parser::parse_assign_statement() {
     initialized_vars.insert(lhs_name);
     stmt->lhs = location_table[lhs_name];
     stmt->eval = eval;
+    stmt->line_no = lhs_token.line_no;
     return stmt;
 }
 
@@ -587,6 +602,53 @@ int Parser::evaluate_primary(primary_t* primary, const std::map<std::string, int
     } else {
         exit(1);
     }
+}
+
+void Parser::check_useless_assignments() {
+    std::set<std::string> used_vars;
+    std::vector<stmt_t*> statements;
+    stmt_t* current = stmt_list_head;
+    while (current != nullptr) {
+        statements.push_back(current);
+        current = current->next;
+    }
+    for (int i = statements.size() - 1; i >= 0; --i) {
+        stmt_t* stmt = statements[i];
+        if (stmt->type == STMT_OUTPUT) {
+            for (const auto& [name, loc] : location_table) {
+                if (loc == stmt->var) {
+                    used_vars.insert(name);
+                    break;
+                }
+            }
+        } else if (stmt->type == STMT_ASSIGN) {
+            std::string lhs_name;
+            for (const auto& [name, loc] : location_table) {
+                if (loc == stmt->lhs) {
+                    lhs_name = name;
+                    break;
+                }
+            }
+            poly_eval_t* eval = static_cast<poly_eval_t*>(stmt->eval);
+            for (const std::string& arg : eval->args) {
+                used_vars.insert(arg);
+            }
+
+            if (!lhs_name.empty() && used_vars.find(lhs_name) == used_vars.end()) {
+                useless_assignments.push_back(stmt->line_no);
+            } else {
+                used_vars.erase(lhs_name);
+            }
+        } else if (stmt->type == STMT_INPUT) {
+            for (const auto& [name, loc] : location_table) {
+                if (loc == stmt->var) {
+                    used_vars.erase(name);
+                    break;
+                }
+            }
+        }
+    }
+    std::sort(useless_assignments.begin(), useless_assignments.end());
 }
 // ====== INPUTS Section ======
 void Parser::parse_inputs_section() {

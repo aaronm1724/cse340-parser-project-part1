@@ -50,6 +50,7 @@ struct stmt_t {
     int lhs = -1;
     void* eval = nullptr;
     stmt_t* next = nullptr;
+    int line_no;
 };
 
 struct poly_eval_t {
@@ -90,6 +91,8 @@ class Parser {
     // ====== Task 3 ====== 
     std::set<std::string> initialized_vars;
     std::vector<int> warning_lines_uninitialized;
+    // ====== Task 4 ======
+    std::vector<int> useless_assignments;
 
     // ====== Parser methods ======
     void parse_tasks_section();
@@ -123,6 +126,7 @@ class Parser {
     int evaluate_term(term_t* term, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
     int evaluate_monomial(monomial_t* monomial, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
     int evaluate_primary(primary_t* primary, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
+    void check_useless_assignments();
 };
 
 #endif
