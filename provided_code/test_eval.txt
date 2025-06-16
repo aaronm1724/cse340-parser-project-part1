@@ -2,13 +2,13 @@ TASKS
 1
 
 POLY
-p(x) = 2x^3 + 3;
-q(y) = y^2;
+P(x) = 2x^3 + 3;
+Q(y) = y^2;
 
 EXECUTE
-input a;
-b = p(a);
-output b;
+INPUT a;
+b = P(a);
+OUTPUT b;
 
 INPUTS
 5
