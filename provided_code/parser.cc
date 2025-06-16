@@ -542,8 +542,7 @@ void Parser::execute_program() {
                         value = std::stoi(actual);
                     } else {
                         if (location_table.find(actual) == location_table.end()) {
-                            std::cerr << "[fatal] variable " << actual << " not declared\n";
-                            exit(1);
+                            location_table[actual] = next_available++;
                         }
                         value = memory[location_table[actual]];
                     }
