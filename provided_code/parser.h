@@ -12,9 +12,36 @@
 #include <string>
 #include <vector>
 
-struct poly_eval_t;
-
 enum StmtType { STMT_INPUT, STMT_OUTPUT, STMT_ASSIGN };
+enum PrimaryKind { VAR, TERM_LIST };
+
+struct primary_t {
+  PrimaryKind kind;
+  int var_index;
+  struct term_list_t* term_list;
+};
+
+struct monomial_t {
+  primary_t* primary;
+  int exponent;
+};
+
+struct term_t {
+  int coefficient;
+  std::vector<monomial_t*> monomial_list;
+};
+
+enum OperatorType { OP_PLUS, OP_MINUS, OP_NONE };
+
+struct term_list_t {
+  term_t* term;
+  OperatorType op = OP_NONE;
+  term_list_t* next = nullptr;
+};
+
+struct poly_body_t {
+  term_list_t* terms;
+};
 
 struct stmt_t {
     StmtType type;
@@ -54,6 +81,7 @@ class Parser {
     stmt_t* stmt_list_head = nullptr;
     int input_counter = 0;
     bool in_inputs_section = false;
+    std::map<std::string, poly_body_t*> poly_bodies;
 
     // ====== Parser methods ======
     void parse_tasks_section();
@@ -64,15 +92,15 @@ class Parser {
     void parse_poly_header();
     void parse_poly_name();
     std::vector<std::string> parse_id_list();
-    void parse_poly_body();
-    void parse_term_list();
-    void parse_term();
-    void parse_monomial_list();
-    void parse_monomial();
-    void parse_primary();
-    void parse_exponent();
-    void parse_add_operator();
-    void parse_coefficient();
+    poly_body_t* parse_poly_body();
+    term_list_t* parse_term_list();
+    term_t* parse_term();
+    std::vector<monomial_t*> parse_monomial_list();
+    monomial_t* parse_monomial();
+    primary_t* parse_primary();
+    int parse_exponent();
+    OperatorType parse_add_operator();
+    int parse_coefficient();
     void parse_execute_section();
     stmt_t* parse_statement_list();
     stmt_t* parse_statement();
@@ -84,6 +112,10 @@ class Parser {
     void parse_argument(std::vector<std::string>& args);
     void parse_inputs_section();
     void execute_program();
+    int evaluate_poly(poly_body_t* body, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
+    int evaluate_term(term_t* term, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
+    int evaluate_monomial(monomial_t* monomial, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
+    int evaluate_primary(primary_t* primary, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
 };
 
 #endif

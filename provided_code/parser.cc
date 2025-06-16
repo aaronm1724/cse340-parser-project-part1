@@ -144,81 +144,109 @@ std::vector<std::string> Parser::parse_id_list() {
     return params;
 }
 
-void Parser::parse_poly_body() {
-    parse_term_list();
+poly_body_t* Parser::parse_poly_body() {
+    term_list_t* terms = parse_term_list();
+    poly_body_t* body = new poly_body_t;
+    body->terms = terms;
+    poly_bodies[current_poly] = body;
+    return body;
 }
 
-void Parser::parse_term_list() {
-    parse_term();
+term_list_t* Parser::parse_term_list() {
+    term_t* first_term = parse_term();
+    term_list_t* node = new term_list_t;
+    node->term = first_term;
     Token t = lexer.peek(1);
     if (t.token_type == PLUS || t.token_type == MINUS) {
-        parse_add_operator();
-        parse_term_list();
+        node->op = parse_add_operator();
+        node->next = parse_term_list();
+    } else {
+        node->op = OP_NONE;
+        node->next = nullptr;
     }
 }
 
-void Parser::parse_add_operator() {
+OperatorType Parser::parse_add_operator() {
     Token t = lexer.peek(1);
     if (t.token_type == PLUS) {
         expect(PLUS);
+        return OP_PLUS;
     } else if (t.token_type == MINUS) {
         expect(MINUS);
+        return OP_MINUS;
     } else {
         syntax_error();
+        return OP_NONE;
     }
 }
 
-void Parser::parse_term() {
+term_t* Parser::parse_term() {
     Token t = lexer.peek(1);
+    term_t* term = new term_t;
     if (t.token_type == NUM) {
-        parse_coefficient();
+        term->coefficient = parse_coefficient();
         t = lexer.peek(1);
         if (t.token_type == ID || t.token_type == LPAREN) {
-            parse_monomial_list();
+            term->monomial_list = parse_monomial_list();
+        } else {
+            term->monomial_list = {};
         }
     } else if (t.token_type == ID || t.token_type == LPAREN) {
-        parse_monomial_list();
+        term->coefficient = 1;
+        term->monomial_list = parse_monomial_list();
     } else {
         syntax_error();
     }
+    return term;
 }
 
-void Parser::parse_monomial_list() {
+std::vector<monomial_t*> Parser::parse_monomial_list() {
+    std::vector<monomial_t*> monomial_list;
     while (true) {
         Token t = lexer.peek(1);
         if (t.token_type == ID || t.token_type == LPAREN) {
-            parse_monomial();
+            monomial_t* monomial = parse_monomial();
+            monomial_list.push_back(monomial);
             t = lexer.peek(1);
         } else {
             break;
         }
     }
+    return monomial_list;
 }
 
-void Parser::parse_monomial() {
+monomial_t* Parser::parse_monomial() {
     Token t = lexer.peek(1);
+    monomial_t* monomial = new monomial_t;
     if (t.token_type == ID || t.token_type == LPAREN) {
-        parse_primary();
+        monomial->primary = parse_primary();
         t = lexer.peek(1);
         if (t.token_type == POWER) {
-            parse_exponent();
+            monomial->exponent = parse_exponent();
+        } else {
+            monomial->exponent = 1;
         }
     } else {
         syntax_error();
     }
+
+    return monomial;
 }
 
-void Parser::parse_coefficient() {
-    expect(NUM);
+int Parser::parse_coefficient() {
+    Token t = expect(NUM);
+    return std::stoi(t.lexeme);
 }
 
-void Parser::parse_exponent() {
+int Parser::parse_exponent() {
     expect(POWER);
-    expect(NUM);
+    Token t = expect(NUM);
+    return std::stoi(t.lexeme);
 }
 
-void Parser::parse_primary() {
+primary_t* Parser::parse_primary() {
     Token t = lexer.peek(1);
+    primary_t* primary = new primary_t;
     if (t.token_type == ID) {
         Token id_token = expect(ID);
         std::string var_name = id_token.lexeme;
@@ -232,13 +260,22 @@ void Parser::parse_primary() {
                 invalid_lines.push_back(id_token.line_no);
             }
         }
+
+        primary->kind = VAR;
+        primary->var_index = location_table[var_name];
+        primary->term_list = nullptr;
     } else if (t.token_type == LPAREN) {
         expect(LPAREN);
-        parse_term_list();
+        term_list_t* term_list =parse_term_list();
         expect(RPAREN);
+        primary->kind = TERM_LIST;
+        primary->term_list = term_list;
+        primary->var_index = -1;
     } else {
         syntax_error();
     }
+
+    return primary;
 }
 
 // ====== EXECUTE Section ======
@@ -454,6 +491,57 @@ void Parser::execute_program() {
     }
 }
 
+int evaluate_poly(poly_body_t* body, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
+    int result = 0;
+    term_list_t* current_term = body->terms;
+    while (current_term != nullptr) {
+        term_t* term = current_term->term;
+        int term_value = evaluate_term(term, arg_values, location_table);
+
+        if (current_term->op == OP_PLUS || current_term->op == OP_NONE) {
+            result += term_value;
+        } else if (current_term->op == OP_MINUS) {
+            result -= term_value;
+        }
+
+        current_term = current_term->next;
+    }
+    return result;
+}
+
+int evaluate_term(term_t* term, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
+    int product = 1;
+    for (monomial_t* monomial : term->monomial_list) {
+        product *= evaluate_monomial(monomial, arg_values, location_table);
+    }
+
+    return term->coefficient * product;
+}
+
+int evaluate_monomial(monomial_t* monomial, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) { 
+    int base = evaluate_primary(monomial->primary, arg_values, location_table);
+    int exponent = monomial->exponent;
+    int result = 1;
+    for (int i = 0; i < exponent; ++i) {
+        result *= base;
+    }
+    return result;
+}
+
+int evaluate_primary(primary_t* primary, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
+    if (primary->kind == VAR) {
+        for (const auto& pair : arg_values) {
+            if (location_table.at(pair.first) == primary->var_index) {
+                return pair.second;
+            }
+        }
+        exit(1);
+    } else if (primary->kind == TERM_LIST) {
+        return evaluate_poly(new poly_body_t{primary->term_list}, arg_values, location_table);
+    } else {
+        exit(1);
+    }
+}
 // ====== INPUTS Section ======
 void Parser::parse_inputs_section() {
     expect(INPUTS);
