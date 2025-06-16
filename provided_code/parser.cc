@@ -467,6 +467,7 @@ void Parser::execute_program() {
                 poly_eval_t* eval = static_cast<poly_eval_t*>(current->eval);
                 std::string poly_name = eval->name;
                 std::vector<std::string> args = eval->args;
+                current_poly = poly_name;
 
                 std::map<std::string, int> arg_values;
                 const std::vector<std::string>& params = poly_params[poly_name];
