@@ -1,17 +1,11 @@
 TASKS
-2 3
+3
 
 POLY
 P(x) = (x + 1)^2;
 Q(x) = x^2 - 4x + 7;
 
 EXECUTE
-INPUT a;
-c = P(a);
-d = Q(b);
-OUTPUT c;
-OUTPUT d;
+c = Q(b);
 
 INPUTS
-3
-2
