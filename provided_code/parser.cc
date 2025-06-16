@@ -470,8 +470,13 @@ void Parser::execute_program() {
 
                 std::map<std::string, int> arg_values;
                 const std::vector<std::string>& params = poly_params[poly_name];
+                if (params.size() != args.size()) {
+                    std::cerr << "[fatal] wrong number of arguments for poly " << poly_name << std::endl;
+                    exit(1);
+                }
                 for (size_t i = 0; i < args.size(); ++i) {
                     const std::string& actual = args[i];
+                    const std::string& expected = params[i];
                     int value;
                     if (isdigit(actual[0]) || (actual[0] == '-' && actual.length() > 1)) {
                         value = std::stoi(actual);
@@ -482,6 +487,7 @@ void Parser::execute_program() {
                         }
                         value = memory[location_table[actual]];
                     }
+                    std::cerr << "[debug] assigning param " << expected << " = " << value << " from actual arg '" << actual << "'\n";
                     arg_values[params[i]] = value;
                 }
                 memory[current->lhs] = evaluate_poly(poly_bodies[poly_name], arg_values, location_table);
@@ -493,6 +499,11 @@ void Parser::execute_program() {
 }
 
 int Parser::evaluate_poly(poly_body_t* body, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
+    std::cout << "[debug] evaluating poly: " << current_poly << std::endl;
+    for (const auto& [param, value] : arg_values) {
+        std::cout << "[debug] param " << param << " = " << value << std::endl;
+    }
+
     int result = 0;
     term_list_t* current_term = body->terms;
     while (current_term != nullptr) {
