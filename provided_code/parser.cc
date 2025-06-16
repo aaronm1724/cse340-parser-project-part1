@@ -424,9 +424,13 @@ stmt_t* Parser::parse_assign_statement() {
             std::cerr << arg << " ";
         }
         std::cerr << std::endl;
+        bool is_first = true;
         for (const std::string& arg : eval->args) {
             std::cerr << "[trace] checking arg '" << arg << "' on line " << lhs_token.line_no << std::endl;
-            if (arg == lhs_name) continue;
+            if (arg == lhs_name && is_first) {
+                is_first = false;
+                continue;
+            }
             if (initialized_vars.find(arg) == initialized_vars.end()) {
                 std::cerr << "[debug] Warning Code 1: '" << arg << "' used uninitialized on line " << lhs_token.line_no << std::endl;
                 warning_lines_uninitialized.push_back(lhs_token.line_no);
