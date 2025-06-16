@@ -484,7 +484,7 @@ void Parser::execute_program() {
                     }
                     arg_values[params[i]] = value;
                 }
-                memory[current->lhs] = 0;
+                memory[current->lhs] = evaluate_poly(poly_bodies[poly_name], arg_values, location_table);
                 break;
             }
         }
