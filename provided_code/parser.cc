@@ -519,6 +519,7 @@ int Parser::evaluate_poly(poly_body_t* body, const std::map<std::string, int>& a
         } else if (current_term->op == OP_MINUS) {
             std::cout << "[debug] subtracting term value from result\n";
             result -= term_value;
+            std::cout << "[debug] result after subtraction = " << result << std::endl;
         }
 
         current_term = current_term->next;
