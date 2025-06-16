@@ -378,8 +378,9 @@ stmt_t* Parser::parse_input_statement() {
     std::string var_name = id_token.lexeme;
     if (location_table.find(var_name) == location_table.end()) {
         location_table[var_name] = next_available++;
-        initialized_vars.insert(var_name);
     }
+    initialized_vars.insert(var_name);
+
 
     stmt_t* stmt = new stmt_t;
     stmt->type = STMT_INPUT;
