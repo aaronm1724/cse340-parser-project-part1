@@ -83,6 +83,7 @@ void Parser::parse_poly_section() {
 
     if (task_numbers.count(1)) {
         if (!duplicates.empty()) {
+            std::sort(duplicates.begin(), duplicates.end(), std::less<int>());
             std::cout << "Semantic Error Code 1:";
             for (int line : duplicates) {
                 std::cout << " " << line;
@@ -293,7 +294,7 @@ primary_t* Parser::parse_primary() {
 // ====== EXECUTE Section ======
 void Parser::parse_execute_section() {
     expect(EXECUTE);
-    stmt_list_head =parse_statement_list();
+    stmt_list_head = parse_statement_list();
     if (stmt_list_head == nullptr) {
         std::cerr << "[fatal] no statements parsed in EXECUTE section\n";
         syntax_error();
@@ -426,11 +427,15 @@ poly_eval_t* Parser::parse_poly_evaluation() {
     if (poly_params.find(poly_name) != poly_params.end()) {
         std::vector<std::string> expected_params = poly_params[poly_name];
         if (args.size() != expected_params.size()) {
-            wrong_arity_lines.push_back(line);
+            if (std::find(wrong_arity_lines.begin(), wrong_arity_lines.end(), line) == wrong_arity_lines.end()) {
+                wrong_arity_lines.push_back(line);
+            }
         }
     } else {
         if (args.size() != 1) {
-            wrong_arity_lines.push_back(line);
+            if (std::find(wrong_arity_lines.begin(), wrong_arity_lines.end(), line) == wrong_arity_lines.end()) {
+                wrong_arity_lines.push_back(line);
+            }
         }
     }
 
@@ -586,50 +591,50 @@ void Parser::check_useless_assignments() {
         statements.push_back(current);
         current = current->next;
     }
+
+    // First pass: collect all variables used in OUTPUT statements
     for (int i = statements.size() - 1; i >= 0; --i) {
         stmt_t* stmt = statements[i];
         if (stmt->type == STMT_OUTPUT) {
             for (const auto& entry : location_table) {
-                const std::string& name = entry.first;
-                int loc = entry.second;
-                if (loc == stmt->var) {
-                    used_vars.insert(name);
-                    break;
-                }
-            }
-        } else if (stmt->type == STMT_ASSIGN) {
-            std::string lhs_name;
-            for (const auto& entry : location_table) {
-                const std::string& name = entry.first;
-                int loc = entry.second;
-                if (loc == stmt->lhs) {
-                    lhs_name = name;
-                    break;
-                }
-            }
-            poly_eval_t* eval = static_cast<poly_eval_t*>(stmt->eval);
-            for (const std::string& arg : eval->args) {
-                used_vars.insert(arg);
-            }
-
-            if (!lhs_name.empty() && used_vars.find(lhs_name) == used_vars.end()) {
-                useless_assignments.push_back(stmt->line_no);
-            } else {
-                used_vars.erase(lhs_name);
-            }
-        } else if (stmt->type == STMT_INPUT) {
-            for (const auto& entry : location_table) {
-                const std::string& name = entry.first;
-                int loc = entry.second;
-                if (loc == stmt->var) {
-                    used_vars.erase(name);
+                if (entry.second == stmt->var) {
+                    used_vars.insert(entry.first);
                     break;
                 }
             }
         }
     }
+
+    // Second pass: track assignments and mark useless ones
+    for (int i = statements.size() - 1; i >= 0; --i) {
+        stmt_t* stmt = statements[i];
+        if (stmt->type == STMT_ASSIGN) {
+            std::string lhs_name;
+            for (const auto& entry : location_table) {
+                if (entry.second == stmt->lhs) {
+                    lhs_name = entry.first;
+                    break;
+                }
+            }
+
+            poly_eval_t* eval = static_cast<poly_eval_t*>(stmt->eval);
+            // Add all variables used in the evaluation to used_vars
+            for (const std::string& arg : eval->args) {
+                if (isdigit(arg[0]) || (arg[0] == '-' && arg.length() > 1)) continue;
+                used_vars.insert(arg);
+            }
+
+            // Check if the assigned variable is used
+            if (!lhs_name.empty() && used_vars.find(lhs_name) == used_vars.end()) {
+                useless_assignments.push_back(stmt->line_no);
+            } else {
+                used_vars.erase(lhs_name);  // Remove it so we can detect earlier useless assignments
+            }
+        }
+    }
     std::sort(useless_assignments.begin(), useless_assignments.end());
 }
+
 // ====== INPUTS Section ======
 void Parser::parse_inputs_section() {
     expect(INPUTS);
@@ -640,23 +645,30 @@ void Parser::parse_inputs_section() {
 
 int main()
 {
-    // note: the parser class has a lexer object instantiated in it. You should not be declaring
-    // a separate lexer object. You can access the lexer object in the parser functions as shown in the
-    // example method Parser::ConsumeAllInput
-    // If you declare another lexer object, lexical analysis will not work correctly
     Parser parser;
-
     parser.parse_program();
+
+    // Check for semantic errors first
+    if (!parser.wrong_arity_lines.empty()) {
+        std::sort(parser.wrong_arity_lines.begin(), parser.wrong_arity_lines.end());
+        std::cout << "Semantic Error Code 4:";
+        for (int line : parser.wrong_arity_lines) {
+            std::cout << " " << line;
+        }
+        std::cout << std::endl;
+        return 0;
+    }
+
     if (parser.task_numbers.count(2)) {
         parser.execute_program();
     }
 
-        if (parser.task_numbers.count(3)) {
+    if (parser.task_numbers.count(3)) {
         if (!parser.warning_lines_uninitialized.empty()) {
-        std::sort(parser.warning_lines_uninitialized.begin(), parser.warning_lines_uninitialized.end());
-        std::cout << "Warning Code 1:";
-        for (int line : parser.warning_lines_uninitialized) {
-            std::cout << " " << line;
+            std::sort(parser.warning_lines_uninitialized.begin(), parser.warning_lines_uninitialized.end());
+            std::cout << "Warning Code 1:";
+            for (int line : parser.warning_lines_uninitialized) {
+                std::cout << " " << line;
             }
             std::cout << std::endl;
         }

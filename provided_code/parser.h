@@ -67,6 +67,7 @@ class Parser {
     std::set<std::string> initialized_vars;
     std::vector<int> warning_lines_uninitialized;
     std::vector<int> useless_assignments;
+    std::vector<int> wrong_arity_lines;
 
   private:
     LexicalAnalyzer lexer;
@@ -79,7 +80,6 @@ class Parser {
     std::map<std::string, std::vector<std::string>> poly_params;
     std::vector<int> invalid_lines;
     std::vector<int> undeclared_eval_lines;
-    std::vector<int> wrong_arity_lines;
     // ====== Memory and Execution State for Task 2 ======
     std::map<std::string, int> location_table;
     std::vector<int> memory = std::vector<int>(1000);
