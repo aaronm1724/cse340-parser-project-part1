@@ -90,7 +90,7 @@ class Parser {
     int input_counter = 0;
     bool in_inputs_section = false;
     std::map<std::string, poly_body_t*> poly_bodies;
-    std::set<std::string> input_variables;
+    std::vector<std::string> input_vars_in_order;
 
     // ====== Parser methods ======
     void parse_tasks_section();

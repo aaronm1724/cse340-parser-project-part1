@@ -359,7 +359,7 @@ stmt_t* Parser::parse_input_statement() {
         location_table[var_name] = next_available++;
     }
     initialized_vars.insert(var_name);
-    input_variables.insert(var_name);
+    input_vars_in_order.push_back(var_name);
 
 
     stmt_t* stmt = new stmt_t;
@@ -482,16 +482,15 @@ void Parser::execute_program() {
     stmt_t* current = stmt_list_head;
     input_counter = 0;
 
+    for (size_t i = 0; i < input_vars_in_order.size(); ++i) {
+        int value = (i < input_values.size()) ? input_values[i] : 0;
+        int loc = location_table[input_vars_in_order[i]];
+        memory[loc] = value;
+        std::cerr << "[debug] INPUT: variable " << input_vars_in_order[i] << " at memory[" << loc << "] set to " << value << "\n";
+    }
     while (current != nullptr) {
         switch (current->type) {
             case STMT_INPUT: {
-                int value = 0;
-                if (input_counter < input_values.size()) {
-                    value = input_values[input_counter++];
-                }
-                memory[current->var] = value;
-                std::cerr << "[debug] INPUT " << input_counter << ": variable at memory[" 
-                << current->var << "] set to " << value << " for location_table index " << current->var << "\n";
                 break;
             }
             case STMT_OUTPUT: {
