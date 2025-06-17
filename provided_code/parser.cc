@@ -649,14 +649,16 @@ int main()
     parser.parse_program();
 
     // Check for semantic errors first
-    if (!parser.wrong_arity_lines.empty()) {
-        std::sort(parser.wrong_arity_lines.begin(), parser.wrong_arity_lines.end());
-        std::cout << "Semantic Error Code 4:";
-        for (int line : parser.wrong_arity_lines) {
-            std::cout << " " << line;
+    if (parser.task_numbers.count(1)) {
+        if (!parser.wrong_arity_lines.empty()) {
+            std::sort(parser.wrong_arity_lines.begin(), parser.wrong_arity_lines.end());
+            std::cout << "Semantic Error Code 4:";
+            for (int line : parser.wrong_arity_lines) {
+                std::cout << " " << line;
+            }
+            std::cout << std::endl;
+            return 0;
         }
-        std::cout << std::endl;
-        return 0;
     }
 
     if (parser.task_numbers.count(2)) {
