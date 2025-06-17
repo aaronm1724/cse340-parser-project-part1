@@ -274,7 +274,7 @@ primary_t* Parser::parse_primary() {
         }
 
         primary->kind = VAR;
-        primary->var_index = location_table[var_name];
+        primary->var_name = var_name;
         primary->term_list = nullptr;
     } else if (t.token_type == LPAREN) {
         expect(LPAREN);
@@ -282,7 +282,7 @@ primary_t* Parser::parse_primary() {
         expect(RPAREN);
         primary->kind = TERM_LIST;
         primary->term_list = term_list;
-        primary->var_index = -1;
+        primary->var_name = "";
     } else {
         syntax_error();
     }
@@ -613,12 +613,13 @@ int Parser::evaluate_monomial(monomial_t* monomial, const std::map<std::string, 
 
 int Parser::evaluate_primary(primary_t* primary, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
     if (primary->kind == VAR) {
-        for (const auto& pair : arg_values) {
-            if (location_table.at(pair.first) == primary->var_index) {
-                return pair.second;
-            }
+        if (arg_values.find(primary->var_name) != arg_values.end()) {
+            return arg_values.at(primary->var_name);
+        } else if (location_table.find(primary->var_name) != location_table.end()) {
+            return memory[location_table.at(primary->var_name)];
+        } else {
+            return 0;
         }
-        exit(1);
     } else if (primary->kind == TERM_LIST) {
         return evaluate_poly(new poly_body_t{primary->term_list}, arg_values, location_table);
     } else {

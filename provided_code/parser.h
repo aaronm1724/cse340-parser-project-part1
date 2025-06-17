@@ -18,8 +18,8 @@ enum PrimaryKind { VAR, TERM_LIST };
 
 struct primary_t {
   PrimaryKind kind;
-  int var_index;
   struct term_list_t* term_list;
+  std::string var_name;
 };
 
 struct monomial_t {
