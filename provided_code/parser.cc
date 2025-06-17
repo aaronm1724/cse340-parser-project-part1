@@ -516,6 +516,8 @@ void Parser::execute_program() {
                     value = input_values[input_counter++];
                 }
                 memory[current->var] = value;
+                std::cerr << "[debug] INPUT " << input_counter - 1 << ": variable at memory[" 
+                << current->var << "] set to " << value << " for location_table index " << current->var << "\n";
                 break;
             }
             case STMT_OUTPUT: {
