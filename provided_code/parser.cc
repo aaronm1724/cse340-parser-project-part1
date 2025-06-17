@@ -682,6 +682,11 @@ void Parser::parse_inputs_section() {
     expect(INPUTS);
     in_inputs_section = true;
     parse_num_list();
+    std::cerr << "[debug] Input values:\n";
+    for (int v : input_values) {
+        std::cerr << v << " ";
+    }
+    std::cerr << std::endl;
     in_inputs_section = false;
 }
 
