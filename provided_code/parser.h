@@ -68,6 +68,8 @@ class Parser {
     std::vector<int> warning_lines_uninitialized;
     std::vector<int> useless_assignments;
     std::vector<int> wrong_arity_lines;
+    std::map<std::string, int> poly_degree_table;
+
 
   private:
     LexicalAnalyzer lexer;
@@ -124,6 +126,11 @@ class Parser {
     int evaluate_term(term_t* term, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
     int evaluate_monomial(monomial_t* monomial, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
     int evaluate_primary(primary_t* primary, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
+    int get_degree(term_list_t* term_list);
+    int get_degree(term_t* term);
+    int get_degree(const std::vector<monomial_t*>& monomial_list);
+    int get_degree(monomial_t* monomial);
+    int get_degree(primary_t* primary);
 };
 
 #endif

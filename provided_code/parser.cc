@@ -157,6 +157,7 @@ poly_body_t* Parser::parse_poly_body() {
     poly_body_t* body = new poly_body_t;
     body->terms = terms;
     poly_bodies[current_poly] = body;
+    poly_degree_table[current_poly] = get_degree(terms);
     return body;
 }
 
@@ -474,6 +475,40 @@ void Parser::parse_argument(std::vector<std::string>& args) {
     }
 }
 
+int Parser::get_degree(term_list_t* term_list) {
+    if (term_list == nullptr) return 0;
+    int left = get_degree(term_list->term);
+    int right = get_degree(term_list->next);
+    return std::max(left, right);
+}
+
+int Parser::get_degree(term_t* term) {
+    return get_degree(term->monomial_list);
+}
+
+int Parser::get_degree(const std::vector<monomial_t*>& monomial_list) {
+    int degree = 0;
+    for (monomial_t* monomial : monomial_list) {
+        degree += get_degree(monomial);
+    }
+    return degree;
+}
+
+int Parser::get_degree(monomial_t* monomial) {
+    int base = get_degree(monomial->primary);
+    return base * monomial->exponent;
+}
+
+int Parser::get_degree(primary_t* primary) {
+    if (primary->kind == VAR) {
+        return 1;
+    } else if (primary->kind == TERM_LIST) {
+        return get_degree(primary->term_list);
+    }
+    return 0;
+}
+
+
 void Parser::execute_program() {
     std::fill(memory.begin(), memory.end(), 0);
     stmt_t* current = stmt_list_head;
@@ -575,9 +610,7 @@ int Parser::evaluate_primary(primary_t* primary, const std::map<std::string, int
             return 0;
         }
     } else if (primary->kind == TERM_LIST) {
-        poly_body_t* body = new poly_body_t;
-        body->terms = primary->term_list;
-        return evaluate_poly(body, arg_values, location_table);
+        return evaluate_poly(new poly_body_t{primary->term_list}, arg_values, location_table);
     } else {
         exit(1);
     }
@@ -685,6 +718,14 @@ int main()
                 std::cout << " " << line;
             }
             std::cout << std::endl;
+        }
+    }
+
+    if (parser.task_numbers.count(5)) {
+        for (const auto& entry : parser.poly_degree_table) {
+            std::string poly_name = entry.first;
+            int degree = entry.second;
+            std::cout << poly_name << ": " << degree << std::endl;
         }
     }
     return 0;
