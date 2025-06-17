@@ -544,9 +544,6 @@ void Parser::execute_program() {
                     if (isdigit(actual[0]) || (actual[0] == '-' && actual.length() > 1)) {
                         value = std::stoi(actual);
                     } else {
-                        if (location_table.find(actual) == location_table.end()) {
-                            location_table[actual] = next_available++;
-                        }
                         std::cerr << "[debug] checking value of arg '" << actual << "': " << memory[location_table[actual]] << std::endl;
                         value = memory[location_table[actual]];
                     }
