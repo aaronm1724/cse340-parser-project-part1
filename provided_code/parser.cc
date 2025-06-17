@@ -621,7 +621,9 @@ int Parser::evaluate_primary(primary_t* primary, const std::map<std::string, int
             return 0;
         }
     } else if (primary->kind == TERM_LIST) {
-        return evaluate_poly(new poly_body_t{primary->term_list}, arg_values, location_table);
+        poly_body_t* body = new poly_body_t;
+        body->terms = primary->term_list;
+        return evaluate_poly(body, arg_values, location_table);
     } else {
         exit(1);
     }
