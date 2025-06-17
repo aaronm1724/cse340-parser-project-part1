@@ -399,14 +399,8 @@ stmt_t* Parser::parse_assign_statement() {
     stmt_t* stmt = new stmt_t;
     stmt->type = STMT_ASSIGN;
     if (task_numbers.count(3)) {
-        std::cerr << "[debug] args on line " << lhs_token.line_no << ": ";
-        for (const std::string& arg : eval->args) {
-            std::cerr << arg << " ";
-        }
-        std::cerr << std::endl;
         for (const std::string& arg : eval->args) {
             if (initialized_vars.find(arg) == initialized_vars.end()) {
-                std::cerr << "[debug] Warning Code 1: '" << arg << "' used uninitialized on line " << lhs_token.line_no << std::endl;
                 warning_lines_uninitialized.push_back(lhs_token.line_no);
             }
         }
@@ -422,9 +416,7 @@ poly_eval_t* Parser::parse_poly_evaluation() {
     Token id_token = expect(ID);
     std::string poly_name = id_token.lexeme;
     int line = id_token.line_no;
-    std::cerr << "[debug] evaluating poly: " << poly_name << " on line " << line << std::endl;
     if (poly_decl_lines.find(poly_name) == poly_decl_lines.end()) {
-        std::cerr << "[debug] poly not declared" << std::endl;
         undeclared_eval_lines.push_back(line);
     }
     expect(LPAREN);
@@ -486,7 +478,6 @@ void Parser::execute_program() {
         int value = (i < input_values.size()) ? input_values[i] : 0;
         int loc = location_table[input_vars_in_order[i]];
         memory[loc] = value;
-        std::cerr << "[debug] INPUT: variable " << input_vars_in_order[i] << " at memory[" << loc << "] set to " << value << "\n";
     }
     while (current != nullptr) {
         switch (current->type) {
@@ -494,7 +485,6 @@ void Parser::execute_program() {
                 break;
             }
             case STMT_OUTPUT: {
-                std::cerr << "[debug] outputting value of " << current->var << ": " << memory[current->var] << std::endl;
                 std::cout << memory[current->var] << std::endl;
                 break;
             }
@@ -503,7 +493,6 @@ void Parser::execute_program() {
                 std::string poly_name = eval->name;
                 std::vector<std::string> args = eval->args;
                 current_poly = poly_name;
-                std::cerr << "[debug] about to assign to " << current->lhs << " using poly: " << poly_name << " on line " << current->line_no << "\n";
                 std::map<std::string, int> arg_values;
                 const std::vector<std::string>& params = poly_params[poly_name];
                 if (params.size() != args.size()) {
@@ -517,17 +506,11 @@ void Parser::execute_program() {
                     if (isdigit(actual[0]) || (actual[0] == '-' && actual.length() > 1)) {
                         value = std::stoi(actual);
                     } else {
-                        std::cerr << "[debug] checking value of arg '" << actual << "': " << memory[location_table[actual]] << std::endl;
                         value = memory[location_table[actual]];
                     }
-                    std::cerr << "[debug] assigning param " << expected << " = " << value << " from actual arg '" << actual << "'\n";
                     arg_values[params[i]] = value;
                 }
                 memory[current->lhs] = evaluate_poly(poly_bodies[poly_name], arg_values, location_table);
-                std::cerr << "[debug] wrote value " << memory[current->lhs] 
-                << " to memory for var " << current->lhs 
-                << " after poly " << poly_name 
-                << " on line " << current->line_no << "\n";
                 break;
             }
         }
@@ -536,33 +519,25 @@ void Parser::execute_program() {
 }
 
 int Parser::evaluate_poly(poly_body_t* body, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
-    std::cout << "[debug] evaluating poly: " << current_poly << std::endl;
     for (const auto& entry : arg_values) {
         const std::string& param = entry.first;
         int value = entry.second;
-        std::cout << "[debug] param " << param << " = " << value << std::endl;
     }
 
     int result = 0;
     term_list_t* current_term = body->terms;
     while (current_term != nullptr) {
-        std::cout << "[debug] term start\n";
         term_t* term = current_term->term;
         int term_value = evaluate_term(term, arg_values, location_table);
-        std::cout << "[debug] evaluated term value = " << term_value << std::endl;
 
         if (current_term->op == OP_PLUS || current_term->op == OP_NONE) {
-            std::cout << "[debug] adding term value to result\n";
             result += term_value;
         } else if (current_term->op == OP_MINUS) {
-            std::cout << "[debug] subtracting term value from result\n";
             result -= term_value;
-            std::cout << "[debug] result after subtraction = " << result << std::endl;
         }
 
         current_term = current_term->next;
     }
-    std::cout << "[debug] final result = " << result << std::endl;
     return result;
 }
 
@@ -660,11 +635,6 @@ void Parser::parse_inputs_section() {
     expect(INPUTS);
     in_inputs_section = true;
     parse_num_list();
-    std::cerr << "[debug] Input values:\n";
-    for (int v : input_values) {
-        std::cerr << v << " ";
-    }
-    std::cerr << std::endl;
     in_inputs_section = false;
 }
 
