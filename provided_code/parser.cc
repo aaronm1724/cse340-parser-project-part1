@@ -537,7 +537,9 @@ void Parser::execute_program() {
 
 int Parser::evaluate_poly(poly_body_t* body, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table) {
     std::cout << "[debug] evaluating poly: " << current_poly << std::endl;
-    for (const auto& [param, value] : arg_values) {
+    for (const auto& entry : arg_values) {
+        const std::string& param = entry.first;
+        int value = entry.second;
         std::cout << "[debug] param " << param << " = " << value << std::endl;
     }
 
@@ -612,7 +614,9 @@ void Parser::check_useless_assignments() {
     for (int i = statements.size() - 1; i >= 0; --i) {
         stmt_t* stmt = statements[i];
         if (stmt->type == STMT_OUTPUT) {
-            for (const auto& [name, loc] : location_table) {
+            for (const auto& entry : location_table) {
+                const std::string& name = entry.first;
+                int loc = entry.second;
                 if (loc == stmt->var) {
                     used_vars.insert(name);
                     break;
@@ -620,7 +624,9 @@ void Parser::check_useless_assignments() {
             }
         } else if (stmt->type == STMT_ASSIGN) {
             std::string lhs_name;
-            for (const auto& [name, loc] : location_table) {
+            for (const auto& entry : location_table) {
+                const std::string& name = entry.first;
+                int loc = entry.second;
                 if (loc == stmt->lhs) {
                     lhs_name = name;
                     break;
@@ -637,7 +643,9 @@ void Parser::check_useless_assignments() {
                 used_vars.erase(lhs_name);
             }
         } else if (stmt->type == STMT_INPUT) {
-            for (const auto& [name, loc] : location_table) {
+            for (const auto& entry : location_table) {
+                const std::string& name = entry.first;
+                int loc = entry.second;
                 if (loc == stmt->var) {
                     used_vars.erase(name);
                     break;
