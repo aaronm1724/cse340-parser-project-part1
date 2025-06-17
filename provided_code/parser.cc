@@ -359,6 +359,7 @@ stmt_t* Parser::parse_input_statement() {
         location_table[var_name] = next_available++;
     }
     initialized_vars.insert(var_name);
+    input_variables.insert(var_name);
 
 
     stmt_t* stmt = new stmt_t;

@@ -68,8 +68,6 @@ class Parser {
     std::vector<int> warning_lines_uninitialized;
     std::vector<int> useless_assignments;
 
-
-
   private:
     LexicalAnalyzer lexer;
     void syntax_error();
@@ -92,6 +90,7 @@ class Parser {
     int input_counter = 0;
     bool in_inputs_section = false;
     std::map<std::string, poly_body_t*> poly_bodies;
+    std::set<std::string> input_variables;
 
     // ====== Parser methods ======
     void parse_tasks_section();
