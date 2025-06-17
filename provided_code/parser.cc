@@ -44,8 +44,8 @@ void Parser::parse_program()
 {
     parse_tasks_section();
     parse_poly_section();
-    parse_inputs_section();
     parse_execute_section();
+    parse_inputs_section();
     expect(END_OF_FILE);
 }
 
@@ -320,33 +320,6 @@ void Parser::parse_execute_section() {
             exit(0);
         }
     }
-
-    if (task_numbers.count(2)) {
-        execute_program();
-    }
-
-    if (task_numbers.count(3)) {
-        if (!warning_lines_uninitialized.empty()) {
-        std::sort(warning_lines_uninitialized.begin(), warning_lines_uninitialized.end());
-        std::cout << "Warning Code 1:";
-        for (int line : warning_lines_uninitialized) {
-            std::cout << " " << line;
-            }
-            std::cout << std::endl;
-        }
-    }
-
-    if (task_numbers.count(4)) {
-        check_useless_assignments();
-        if (!useless_assignments.empty()) {
-            std::sort(useless_assignments.begin(), useless_assignments.end());
-            std::cout << "Warning Code 2:";
-            for (int line : useless_assignments) {
-                std::cout << " " << line;
-            }
-            std::cout << std::endl;
-        }
-    }
 }
 
 stmt_t* Parser::parse_statement_list() {
@@ -516,7 +489,7 @@ void Parser::execute_program() {
                     value = input_values[input_counter++];
                 }
                 memory[current->var] = value;
-                std::cerr << "[debug] INPUT " << input_counter - 1 << ": variable at memory[" 
+                std::cerr << "[debug] INPUT " << input_counter << ": variable at memory[" 
                 << current->var << "] set to " << value << " for location_table index " << current->var << "\n";
                 break;
             }
@@ -696,4 +669,30 @@ int main()
     Parser parser;
 
     parser.parse_program();
+    if (parser.task_numbers.count(2)) {
+        parser.execute_program();
+    }
+
+        if (parser.task_numbers.count(3)) {
+        if (!parser.warning_lines_uninitialized.empty()) {
+        std::sort(parser.warning_lines_uninitialized.begin(), parser.warning_lines_uninitialized.end());
+        std::cout << "Warning Code 1:";
+        for (int line : parser.warning_lines_uninitialized) {
+            std::cout << " " << line;
+            }
+            std::cout << std::endl;
+        }
+    }
+
+    if (parser.task_numbers.count(4)) {
+        parser.check_useless_assignments();
+        if (!parser.useless_assignments.empty()) {
+            std::sort(parser.useless_assignments.begin(), parser.useless_assignments.end());
+            std::cout << "Warning Code 2:";
+            for (int line : parser.useless_assignments) {
+                std::cout << " " << line;
+            }
+            std::cout << std::endl;
+        }
+    }
 }

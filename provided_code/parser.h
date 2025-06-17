@@ -62,7 +62,11 @@ class Parser {
   public:
     void parse_program();
     void execute_program();
+    void check_useless_assignments();
     std::set<int> task_numbers;
+    std::set<std::string> initialized_vars;
+    std::vector<int> warning_lines_uninitialized;
+    std::vector<int> useless_assignments;
 
 
 
@@ -88,11 +92,6 @@ class Parser {
     int input_counter = 0;
     bool in_inputs_section = false;
     std::map<std::string, poly_body_t*> poly_bodies;
-    // ====== Task 3 ====== 
-    std::set<std::string> initialized_vars;
-    std::vector<int> warning_lines_uninitialized;
-    // ====== Task 4 ======
-    std::vector<int> useless_assignments;
 
     // ====== Parser methods ======
     void parse_tasks_section();
@@ -126,7 +125,6 @@ class Parser {
     int evaluate_term(term_t* term, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
     int evaluate_monomial(monomial_t* monomial, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
     int evaluate_primary(primary_t* primary, const std::map<std::string, int>& arg_values, const std::map<std::string, int>& location_table);
-    void check_useless_assignments();
 };
 
 #endif
